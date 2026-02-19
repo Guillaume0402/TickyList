@@ -1,0 +1,21 @@
+@use "../abstracts/mixins" as *;
+
+.app-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+
+  label { color: var(--muted); font-size: 0.95rem; }
+}
+
+.app-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--text);
+
+  &:focus-visible { @include focus-ring; }
+}

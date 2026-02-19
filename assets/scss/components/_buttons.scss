@@ -1,0 +1,26 @@
+@use "../abstracts/mixins" as *;
+
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.10);
+
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover { background: rgba(255,255,255,0.10); }
+  &:focus-visible { @include focus-ring; }
+}
+
+.app-btn--primary {
+  border-color: rgba(0,230,118,0.35);
+  background: rgba(0,230,118,0.14);
+
+  &:hover { background: rgba(0,230,118,0.20); }
+}

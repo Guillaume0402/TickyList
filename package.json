@@ -1,0 +1,16 @@
+{
+  "name": "template-php-mysql",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "sass --watch --load-path=node_modules --quiet-deps assets/scss/app.scss:public/assets/app.css",
+    "build": "sass --load-path=node_modules --quiet-deps assets/scss/app.scss:public/assets/app.css --style=compressed"
+  },
+  "devDependencies": {
+    "sass": "^1.97.3"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "@popperjs/core": "^2.11.8"
+  }
+}

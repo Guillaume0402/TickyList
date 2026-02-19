@@ -1,0 +1,15 @@
+.env
+.env.local
+
+/vendor/
+node_modules/
+
+# uploads
+/public/uploads/
+
+# Sass cache + sourcemaps
+.sass-cache/
+public/assets/*.map
+
+# OS
+.DS_Store

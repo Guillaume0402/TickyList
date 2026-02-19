@@ -1,0 +1,16 @@
+@use "variables" as *;
+
+@mixin respond($bp) {
+  @if $bp == sm {
+    @media (min-width: $bp-sm) { @content; }
+  } @else if $bp == md {
+    @media (min-width: $bp-md) { @content; }
+  } @else if $bp == lg {
+    @media (min-width: $bp-lg) { @content; }
+  }
+}
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.25);
+}
