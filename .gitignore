@@ -16,9 +16,10 @@ storage/logs/*.log
 vendor/
 node_modules/
 
-# Compiled assets
-public/assets/css/*.css
+# Compiled assets (Sass output)
 public/assets/css/*.css.map
+# Allow style.css since we're not using Sass compilation in this project
+!public/assets/css/style.css
 !public/assets/css/.gitkeep
 
 # OS files
