@@ -1,0 +1,11 @@
+# TickLyst - Deny access to PHP files
+<Files "*.php">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Allow index.php
+<Files "index.php">
+    Order Allow,Deny
+    Allow from all
+</Files>

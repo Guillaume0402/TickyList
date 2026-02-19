@@ -1,0 +1,30 @@
+# Environment files
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+storage/logs/*.log
+!storage/logs/.gitkeep
+
+# Dependencies
+vendor/
+node_modules/
+
+# Compiled assets
+public/assets/css/*.css
+public/assets/css/*.css.map
+!public/assets/css/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
