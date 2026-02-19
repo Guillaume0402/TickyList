@@ -10,12 +10,12 @@
  */
 
 // Load configuration
-require_once __DIR__ . '/../config/env.php';
-loadEnv(__DIR__ . '/../.env');
+require_once __DIR__ . '/config/env.php';
+loadEnv(__DIR__ . '/.env');
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../app/Models/Task.php';
-require_once __DIR__ . '/../app/Models/User.php';
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/app/Models/Task.php';
+require_once __DIR__ . '/app/Models/User.php';
 
 // Check if running from CLI
 if (php_sapi_name() !== 'cli') {
@@ -112,7 +112,7 @@ function sendReminderEmail($task) {
     // return mail($to, $subject, $message, "From: noreply@ticklyst.local");
     
     // For development/testing, just log the email
-    $logFile = __DIR__ . '/../storage/logs/reminders.log';
+    $logFile = __DIR__ . '/storage/logs/reminders.log';
     $logEntry = date('Y-m-d H:i:s') . " - Email to {$to}: {$subject}\n";
     file_put_contents($logFile, $logEntry, FILE_APPEND);
     

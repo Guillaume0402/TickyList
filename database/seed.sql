@@ -5,7 +5,7 @@ USE ticklyst;
 
 -- Insert demo user (password: password123)
 INSERT INTO users (email, password, name) VALUES
-('demo@ticklyst.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Demo User');
+('demo@ticklyst.com', '$2y$10$BazWKARPJt.y5SIHwePToeI3WCdSiu3SJpt3wCtBNCo9/gW7mQ6Be', 'Demo User');
 
 -- Get demo user ID
 SET @demo_user_id = LAST_INSERT_ID();
