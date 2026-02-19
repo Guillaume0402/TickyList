@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticklyst-web
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=development
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=ticklyst
+      - DB_USER=ticklyst
+      - DB_PASS=ticklyst123
+    depends_on:
+      - db
+    networks:
+      - ticklyst-network
+
+  db:
+    image: mysql:8.0
+    container_name: ticklyst-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ticklyst
+      MYSQL_USER: ticklyst
+      MYSQL_PASSWORD: ticklyst123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    networks:
+      - ticklyst-network
+
+volumes:
+  mysql_data:
+
+networks:
+  ticklyst-network:
+    driver: bridge
