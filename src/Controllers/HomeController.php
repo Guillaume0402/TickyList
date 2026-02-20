@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Core\AbstractController;
+use App\Http\AbstractController;
 
 final class HomeController extends AbstractController
 {

@@ -19,7 +19,7 @@ spl_autoload_register(function (string $class) {
     if (is_file($file)) require $file;
 });
 
-use App\Core\Router;
+use App\Http\Router;
 
 $router = new Router();
 

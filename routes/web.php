@@ -1,7 +1,8 @@
 <?php
 use App\Controllers\HomeController;
+use App\Http\Router;
 
-/** @var \App\Core\Router $router */
+/** @var Router $router */
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/about', [HomeController::class, 'about']);
