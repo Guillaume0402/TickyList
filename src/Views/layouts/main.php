@@ -21,7 +21,7 @@ $flashes = Flash::pull();
 
     <header class="header border-bottom">
         <div class="app-container py-3 d-flex align-items-center justify-content-between">
-            <div class="brand fw-bold">Template</div>
+            <div class="brand fw-bold">TickyList</div>
 
             <nav class="d-flex gap-2">
                 <a class="text-decoration-none" href="/">Accueil</a>
