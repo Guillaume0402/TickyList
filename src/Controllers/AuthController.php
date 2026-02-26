@@ -64,41 +64,34 @@ final class AuthController extends AbstractController
 
     public function logout(): void
     {
-        // CSRF (POST obligatoire)
         $token = $_POST['csrf_token'] ?? '';
         if (!Csrf::check($token)) {
-            // option simple : on renvoie sur accueil
             Flash::add('Token CSRF invalide.', 'error');
             header('Location: /');
             exit;
         }
 
-        // On vide la session
-        $_SESSION = [];
+        // 1) Mettre le flash AVANT de vider/détruire
+        Flash::add('Déconnexion réussie.', 'success');
 
-        // On détruit le cookie de session si existant (propre)
-        if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params['path'],
-                $params['domain'],
-                $params['secure'],
-                $params['httponly']
-            );
+        // 2) Vider la session (mais on garde le flash)
+        // => on garde uniquement 'flash'
+        $flash = $_SESSION['flash'] ?? null;
+        $_SESSION = [];
+        if ($flash !== null) {
+            $_SESSION['flash'] = $flash;
         }
 
-        session_destroy();
+        // 3) Régénérer l'id de session (recommandé)
+        session_regenerate_id(true);
 
-        Flash::add('👋 Déconnexion réussie.', 'success');
+        // 4) Redirection
         header('Location: /login');
         exit;
     }
 
     public function registerPost(): string
-    {      
+    {
         // 1) CSRF d'abord
         $email = strtolower(trim($_POST['email'] ?? ''));
         $token = $_POST['csrf_token'] ?? '';
@@ -109,7 +102,7 @@ final class AuthController extends AbstractController
                 'error' => 'Token CSRF invalide. Recharge la page.',
                 'csrfToken' => Csrf::token(),
                 'old' => ['email' => $email],
-                
+
             ]);
         }
 
