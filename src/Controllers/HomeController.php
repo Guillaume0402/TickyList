@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Http\AbstractController;
 use App\Services\Csrf;
+use App\Services\Flash;
 
 final class HomeController extends AbstractController
 {
@@ -27,23 +28,37 @@ final class HomeController extends AbstractController
 
     public function register(): string
     {
+        if (!empty($_SESSION['user_id'])) {
+            Flash::add('Vous êtes déjà connecté.', 'info');
+            header('Location: /');
+            exit;
+        }
+
         return $this->render('auth/register', [
             'pageTitle' => 'Inscription',
             'title' => 'Inscription',
             'subtitle' => 'Page register OK',
             'csrfToken' => Csrf::token(),
+            'error' => null,
+            'old' => ['email' => ''],
         ]);
     }
 
     public function login(): string
     {
+        if (!empty($_SESSION['user_id'])) {
+            Flash::add('Vous êtes déjà connecté.', 'info');
+            header('Location: /');
+            exit;
+        }
+
         return $this->render('auth/login', [
             'pageTitle' => 'Connexion',
             'title' => 'Connexion',
             'subtitle' => 'Page login OK',
             'csrfToken' => Csrf::token(),
+            'error' => null,
+            'old' => ['email' => ''],
         ]);
     }
-
-   
 }

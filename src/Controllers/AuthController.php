@@ -12,7 +12,7 @@ final class AuthController extends AbstractController
     public function loginPost(): string
     {
         // 1) CSRF d'abord (toujours sur un POST)
-        $email = trim($_POST['email'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
         $token = $_POST['csrf_token'] ?? '';
         if (!Csrf::check($token)) {
             return $this->render('auth/login', [
@@ -100,7 +100,7 @@ final class AuthController extends AbstractController
     public function registerPost(): string
     {      
         // 1) CSRF d'abord
-        $email = trim($_POST['email'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
         $token = $_POST['csrf_token'] ?? '';
         if (!Csrf::check($token)) {
             return $this->render('auth/register', [
