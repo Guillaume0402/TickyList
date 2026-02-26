@@ -12,16 +12,10 @@ final class AuthController extends AbstractController
     public function loginPost(): string
     {
         // 1) CSRF d'abord (toujours sur un POST)
-        $email = strtolower(trim($_POST['email'] ?? ''));
+        $email = mb_strtolower(trim($_POST['email'] ?? ''), 'UTF-8');
         $token = $_POST['csrf_token'] ?? '';
         if (!Csrf::check($token)) {
-            return $this->render('auth/login', [
-                'pageTitle' => 'Connexion',
-                'title' => 'Connexion',
-                'error' => 'Token CSRF invalide. Recharge la page.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderLoginError('Token CSRF invalide. Recharge la page.', $email);
         }
 
         // 2) Récupérer / nettoyer les champs        
@@ -29,13 +23,7 @@ final class AuthController extends AbstractController
 
         // (optionnel mais utile) : validation minimum
         if ($email === '' || $password === '') {
-            return $this->render('auth/login', [
-                'pageTitle' => 'Connexion',
-                'title' => 'Connexion',
-                'error' => 'Veuillez remplir tous les champs.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderLoginError('Veuillez remplir tous les champs.', $email);
         }
 
         // 3) Chercher l'utilisateur
@@ -44,13 +32,7 @@ final class AuthController extends AbstractController
 
         // 4) Vérifier le mot de passe
         if (!$user || !password_verify($password, $user['password_hash'])) {
-            return $this->render('auth/login', [
-                'pageTitle' => 'Connexion',
-                'title' => 'Connexion',
-                'error' => 'Email ou mot de passe incorrect.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderLoginError('Email ou mot de passe incorrect.', $email);
         }
 
         // 5) Login OK -> session
@@ -61,7 +43,6 @@ final class AuthController extends AbstractController
         header('Location: /');
         exit;
     }
-
     public function logout(): void
     {
         $token = $_POST['csrf_token'] ?? '';
@@ -71,21 +52,31 @@ final class AuthController extends AbstractController
             exit;
         }
 
-        // 1) Mettre le flash AVANT de vider/détruire
-        Flash::add('Déconnexion réussie.', 'success');
+        $flashMessage = ['message' => 'Déconnexion réussie.', 'type' => 'success'];
 
-        // 2) Vider la session (mais on garde le flash)
-        // => on garde uniquement 'flash'
-        $flash = $_SESSION['flash'] ?? null;
         $_SESSION = [];
-        if ($flash !== null) {
-            $_SESSION['flash'] = $flash;
+
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
         }
 
-        // 3) Régénérer l'id de session (recommandé)
+        session_destroy();
+
+        session_start();
         session_regenerate_id(true);
 
-        // 4) Redirection
+        $_SESSION['flash'] = $_SESSION['flash'] ?? [];
+        $_SESSION['flash'][] = $flashMessage;
+
         header('Location: /login');
         exit;
     }
@@ -93,17 +84,10 @@ final class AuthController extends AbstractController
     public function registerPost(): string
     {
         // 1) CSRF d'abord
-        $email = strtolower(trim($_POST['email'] ?? ''));
+        $email = mb_strtolower(trim($_POST['email'] ?? ''), 'UTF-8');
         $token = $_POST['csrf_token'] ?? '';
         if (!Csrf::check($token)) {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Token CSRF invalide. Recharge la page.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-
-            ]);
+            return $this->renderRegisterError('Token CSRF invalide. Recharge la page.', $email);
         }
 
         // 2) Inputs        
@@ -112,55 +96,25 @@ final class AuthController extends AbstractController
 
         // 3) Validations
         if ($email === '' || $password === '' || $passwordConfirm === '') {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Veuillez remplir tous les champs.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderRegisterError('Veuillez remplir tous les champs.', $email);
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Email invalide.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderRegisterError('Email invalide.', $email);
         }
 
         if ($password !== $passwordConfirm) {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Les mots de passe ne correspondent pas.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderRegisterError('Les mots de passe ne correspondent pas.', $email);
         }
 
         if (strlen($password) < 8) {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Mot de passe trop court (8 caractères minimum).',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderRegisterError('Mot de passe trop court (8 caractères minimum).', $email);
         }
 
         // 4) Email déjà utilisé ?
         $repo = new UserRepository();
         if ($repo->findByEmail($email)) {
-            return $this->render('auth/register', [
-                'pageTitle' => 'Inscription',
-                'title' => 'Inscription',
-                'error' => 'Cet email est déjà utilisé.',
-                'csrfToken' => Csrf::token(),
-                'old' => ['email' => $email],
-            ]);
+            return $this->renderRegisterError('Cet email est déjà utilisé.', $email);
         }
 
         // 5) Create user
@@ -174,5 +128,27 @@ final class AuthController extends AbstractController
         Flash::add('✅ Compte créé ! Bienvenue 👋', 'success');
         header('Location: /');
         exit;
+    }
+
+    private function renderLoginError(string $message, string $email): string
+    {
+        return $this->render('auth/login', [
+            'pageTitle' => 'Connexion',
+            'title' => 'Connexion',
+            'error' => $message,
+            'csrfToken' => Csrf::token(),
+            'old' => ['email' => $email],
+        ]);
+    }
+
+    private function renderRegisterError(string $message, string $email): string
+    {
+        return $this->render('auth/register', [
+            'pageTitle' => 'Inscription',
+            'title' => 'Inscription',
+            'error' => $message,
+            'csrfToken' => Csrf::token(),
+            'old' => ['email' => $email],
+        ]);
     }
 }
