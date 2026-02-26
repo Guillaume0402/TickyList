@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Http\AbstractController;
+use App\Services\Csrf;
 
 final class HomeController extends AbstractController
 {
@@ -23,21 +25,25 @@ final class HomeController extends AbstractController
         ]);
     }
 
-    public function register (): string
+    public function register(): string
     {
         return $this->render('home/register', [
             'pageTitle' => 'Inscription',
             'title' => 'Inscription',
             'subtitle' => 'Page register OK',
+            'csrfToken' => Csrf::token(),
         ]);
     }
 
-    public function login (): string
+    public function login(): string
     {
         return $this->render('auth/login', [
             'pageTitle' => 'Connexion',
             'title' => 'Connexion',
             'subtitle' => 'Page login OK',
+            'csrfToken' => Csrf::token(),
         ]);
     }
+
+   
 }
