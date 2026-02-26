@@ -8,6 +8,11 @@ error_reporting(E_ALL);
 
 define('ROOT', dirname(__DIR__));
 
+require ROOT . '/src/Services/env.php';
+loadEnv(ROOT . '/.env');
+
+require ROOT . '/src/Services/db.php';
+
 spl_autoload_register(function (string $class) {
     $prefix = 'App\\';
     $baseDir = ROOT . '/src/';
