@@ -58,4 +58,39 @@ final class AuthController extends AbstractController
         header('Location: /');
         exit;
     }
+
+    public function logout(): void
+    {
+        // CSRF (POST obligatoire)
+        $token = $_POST['csrf_token'] ?? '';
+        if (!Csrf::check($token)) {
+            // option simple : on renvoie sur accueil
+            Flash::add('Token CSRF invalide.', 'error');
+            header('Location: /');
+            exit;
+        }
+
+        // On vide la session
+        $_SESSION = [];
+
+        // On détruit le cookie de session si existant (propre)
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
+        }
+
+        session_destroy();
+
+        Flash::add('👋 Déconnexion réussie.', 'success');
+        header('Location: /login');
+        exit;
+    }
 }

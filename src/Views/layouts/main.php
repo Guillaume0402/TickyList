@@ -26,6 +26,16 @@ $flashes = Flash::pull();
             <nav class="d-flex gap-2">
                 <a class="text-decoration-none" href="/">Accueil</a>
                 <a class="text-decoration-none" href="/about">À propos</a>
+
+                <?php if (empty($_SESSION['user_id'])): ?>
+                    <a class="text-decoration-none" href="/register">Inscription</a>
+                    <a class="text-decoration-none" href="/login">Connexion</a>
+                <?php else: ?>
+                    <form action="/logout" method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token()) ?>">
+                        <button type="submit" class="app-btn app-btn--ghost">Se déconnecter</button>
+                    </form>
+                <?php endif; ?>
             </nav>
         </div>
     </header>
@@ -43,7 +53,7 @@ $flashes = Flash::pull();
         <?php endif; ?>
 
         <?= $content ?? '' ?>
-        
+
     </main>
 
     <footer class="footer border-top py-3">

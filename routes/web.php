@@ -11,3 +11,4 @@ $router->get('/about', [HomeController::class, 'about']);
 $router->get('/register', [HomeController::class, 'register']);
 $router->get('/login', [HomeController::class, 'login']);
 $router->post('/login', [AuthController::class, 'loginPost']);
+$router->post('/logout', [AuthController::class, 'logout']);
