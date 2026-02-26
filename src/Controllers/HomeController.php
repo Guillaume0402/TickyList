@@ -22,4 +22,22 @@ final class HomeController extends AbstractController
             'subtitle' => 'Page about OK',
         ]);
     }
+
+    public function register (): string
+    {
+        return $this->render('home/register', [
+            'pageTitle' => 'Inscription',
+            'title' => 'Inscription',
+            'subtitle' => 'Page register OK',
+        ]);
+    }
+
+    public function login (): string
+    {
+        return $this->render('auth/login', [
+            'pageTitle' => 'Connexion',
+            'title' => 'Connexion',
+            'subtitle' => 'Page login OK',
+        ]);
+    }
 }
