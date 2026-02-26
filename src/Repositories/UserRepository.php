@@ -12,13 +12,17 @@ final class UserRepository
         return $stmt->fetch() ?: null;
     }
 
-    // public function create(string $email, string $password): int
-    // {
-    //     $stmt = db()->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
-    //     $stmt->execute([
-    //         'email' => $email,
-    //         'password' => password_hash($password, PASSWORD_DEFAULT),
-    //     ]);
-    //     return (int)db()->lastInsertId();
-    // }
+    public function create(string $email, string $passwordHash): int
+    {
+        $stmt = db()->prepare("
+        INSERT INTO users (email, password_hash, created_at)
+        VALUES (:email, :password_hash, NOW())
+    ");
+        $stmt->execute([
+            'email' => $email,
+            'password_hash' => $passwordHash,
+        ]);
+
+        return (int) db()->lastInsertId();
+    }
 }

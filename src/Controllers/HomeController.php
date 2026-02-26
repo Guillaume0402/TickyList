@@ -27,7 +27,7 @@ final class HomeController extends AbstractController
 
     public function register(): string
     {
-        return $this->render('home/register', [
+        return $this->render('auth/register', [
             'pageTitle' => 'Inscription',
             'title' => 'Inscription',
             'subtitle' => 'Page register OK',
