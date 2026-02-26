@@ -13,3 +13,6 @@ public/assets/*.map
 
 # OS
 .DS_Store
+
+/public/assets/app.css
+/public/assets/app.css.map
