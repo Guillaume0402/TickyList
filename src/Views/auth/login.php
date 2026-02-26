@@ -6,6 +6,14 @@
             <p class="login-card__subtitle">Content de vous revoir !</p>
         </div>
 
+        <?php if (!empty($error)): ?>
+            <div class="flash-wrap">
+                <div class="flash flash--error">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <form action="/login" method="POST" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? '') ?>">
 
@@ -20,7 +28,7 @@
                     autocomplete="email"
                     required
                     value="<?= htmlspecialchars($old['email'] ?? '') ?>">
-                    
+
             </div>
 
             <div class="app-field">
