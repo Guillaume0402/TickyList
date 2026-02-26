@@ -1,11 +1,17 @@
 <?php
 
 declare(strict_types=1);
+session_start();
 
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
 define('ROOT', dirname(__DIR__));
+
+require ROOT . '/src/Services/env.php';
+loadEnv(ROOT . '/.env');
+
+require ROOT . '/src/Services/db.php';
 
 spl_autoload_register(function (string $class) {
     $prefix = 'App\\';
