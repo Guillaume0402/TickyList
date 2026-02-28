@@ -17,4 +17,21 @@ final class ProjectRepository
         $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll();
     }
+
+    public function create(int $userId, string $name): int
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare("INSERT INTO projects (user_id, name) VALUES (:user_id, :name)");
+        $stmt->execute(['user_id' => $userId, 'name' => $name]);
+        return (int) $pdo->lastInsertId();
+    }
+
+    public function findByIdForUser(int $projectId, int $userId): ?array
+    {
+        $stmt = db()->prepare("SELECT id, name FROM projects WHERE id = :id AND user_id = :user_id AND deleted_at IS NULL LIMIT 1");
+        $stmt->execute(['id' => $projectId, 'user_id' => $userId]);
+        $project = $stmt->fetch();
+        return $project ?: null;
+    }
+    
 }
