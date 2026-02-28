@@ -60,16 +60,5 @@ final class HomeController extends AbstractController
             'error' => null,
             'old' => ['email' => ''],
         ]);
-    }
-
-   
-
-    public function projectTasks(): string
-    {
-        return $this->render('pages/project-task', [
-            'pageTitle' => 'Projets & Tâches',
-            'title' => 'Projets & Tâches',
-            'subtitle' => 'Page projet-tasks OK',
-        ]);
-    }
+    }  
 }
