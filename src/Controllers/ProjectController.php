@@ -1,24 +1,89 @@
 <?php
-namespace App\Controllers;
-use App\Http\AbstractController;
 
+namespace App\Controllers;
+
+use App\Http\AbstractController;
+use App\Repositories\ProjectRepository;
+use App\Services\Flash;
+use App\Services\Csrf;
 
 final class ProjectController extends AbstractController
 {
-     public function projects(): string
+    public function index(): string
     {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+        $repo = new ProjectRepository();
+        $projects = $repo->findActiveWithStatsByUserId((int)$_SESSION['user_id']);
         return $this->render('pages/projects', [
-            'pageTitle' => 'Projets',
-            'title' => 'Projets',
-            'subtitle' => 'Page projets OK',
-            'projects' => $this->getProjects(),
+            'pageTitle' => 'Mes Projets',
+            'title' => 'Mes Projets',
+            'subtitle' => 'Liste de vos projets avec stats',
+            'projects' => $projects,
         ]);
     }
 
-    private function getProjects(): array
+    public function create(): void
     {
-        $repo = new \App\Repositories\ProjectRepository();
-        return $repo->findActiveWithStatsByUserId($_SESSION['user_id']);
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            http_response_code(405);
+            exit('Method Not Allowed');
+        }
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour créer un projet.', 'error');
+            header('Location: /login');
+            exit;
+        }
+        if (!isset($_POST['csrf_token']) || !Csrf::check($_POST['csrf_token'])) {
+            Flash::add('Token CSRF invalide. Recharge la page.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        $name = trim((string)($_POST['name'] ?? ''));
+        if ($name === '') {
+            Flash::add('Le nom du projet est requis.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        if (mb_strlen($name, 'UTF-8') > 255) {
+            Flash::add('Nom trop long (255 max).', 'error');
+            header('Location: /projects');
+            exit;
+        }
+
+        $repo = new ProjectRepository();
+        $projectId = $repo->create((int)$_SESSION['user_id'], $name);
+        Flash::add('Projet créé avec succès.', 'success');
+        header('Location: /project?id=' . $projectId);
+        exit;
+    }
+
+    public function show(): string
+    {
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour créer un projet.', 'error');
+            header('Location: /login');
+            exit;
+        }
+        $projectId = (int)($_GET['id'] ?? 0);
+        if ($projectId <= 0) {
+            Flash::add('ID de projet invalide.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        $repo = new ProjectRepository();
+        $project = $repo->findByIdForUser($projectId, (int)$_SESSION['user_id']);
+        if (!$project) {
+            Flash::add('Projet non trouvé ou vous n\'avez pas accès à ce projet.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        return $this->render('pages/project-task', [
+            'pageTitle' => $project['name'],
+            'title' => $project['name'],
+            'project' => $project,
+        ]);
     }
 }
-?>

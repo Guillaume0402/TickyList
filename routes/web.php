@@ -14,6 +14,8 @@ $router->post('/register', [AuthController::class, 'registerPost']);
 $router->get('/login', [HomeController::class, 'login']);
 $router->post('/login', [AuthController::class, 'loginPost']);
 $router->post('/logout', [AuthController::class, 'logout']);
-$router->get('/projects', [ProjectController::class, 'projects']);
-$router->get('/project-task', [HomeController::class, 'projectTasks']);
+$router->get('/projects', [ProjectController::class, 'index']);
+$router->post('/projects/create', [ProjectController::class, 'create']);
+$router->get('/project', [ProjectController::class, 'show']);
+
 
