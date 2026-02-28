@@ -4,7 +4,7 @@
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->
     <main>
-
+<?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?>
         <!-- Project header ─────────────────────────────────────────────── -->
         <div class="project-header">
             <div style="display:flex;gap:14px;align-items:flex-start;">
