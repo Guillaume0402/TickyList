@@ -36,6 +36,23 @@
                 </div>
             </div>
             <a href="#" class="app-btn app-btn--primary">+ Ajouter une tâche</a>
+             <div class="project-btn">
+                        <div class="project-rename">
+                            <form method="POST" action="/projects/rename">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                <input type="text" name="name" required maxlength="255" value="<?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                <button type="submit" class="app-btn app-btn--secondary">Renommer</button>
+                            </form>
+                        </div>
+                        <div class="project-delete">
+                            <form method="POST" action="/projects/delete">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                <button type="submit" class="app-btn app-btn--danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
         </div>
 
         <!-- Filter tabs ────────────────────────────────────────────────── -->
