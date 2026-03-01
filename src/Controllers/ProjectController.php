@@ -119,4 +119,50 @@ final class ProjectController extends AbstractController
         header('Location: /projects');
         exit;
     }
+
+    public function rename(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            http_response_code(405);
+            exit('Method Not Allowed');
+        }
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour renommer un projet.', 'error');
+            header('Location: /login');
+            exit;
+        }
+        if (!isset($_POST['csrf_token']) || !Csrf::check($_POST['csrf_token'])) {
+            Flash::add('Token CSRF invalide. Recharge la page.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        $name = trim((string)($_POST['name'] ?? ''));
+        if ($projectId <= 0) {
+            Flash::add('ID de projet invalide.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        if ($name === '') {
+            Flash::add('Le nom du projet est requis.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        if (mb_strlen($name, 'UTF-8') > 255) {
+            Flash::add('Nom trop long (255 max).', 'error');
+            header('Location: /projects');
+            exit;
+        }
+
+        $repo = new ProjectRepository();
+        $updated = $repo->rename($projectId, (int)$_SESSION['user_id'], $name);
+
+        if ($updated) {
+            Flash::add('Projet renommé avec succès.', 'success');
+        } else {
+            Flash::add('Projet non trouvé ou déjà supprimé.', 'error');
+        }
+        header('Location: /project?id=' . (int)$projectId);
+        exit;
+    }
 }

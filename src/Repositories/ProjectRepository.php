@@ -41,4 +41,10 @@ final class ProjectRepository
         return $stmt->rowCount() > 0;
     }
     
+    public function rename(int $projectId, int $userId, string $newName): bool
+    {
+        $stmt = db()->prepare("UPDATE projects SET name = :name, updated_at = NOW() WHERE id = :id AND user_id = :user_id AND deleted_at IS NULL");
+        $stmt->execute(['name' => $newName, 'id' => $projectId, 'user_id' => $userId]);
+        return $stmt->rowCount() > 0;
+    }
 }
