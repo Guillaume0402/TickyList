@@ -86,4 +86,37 @@ final class ProjectController extends AbstractController
             'project' => $project,
         ]);
     }
+
+    public function delete(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            http_response_code(405);
+            exit('Method Not Allowed');
+        }
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour supprimer un projet.', 'error');
+            header('Location: /login');
+            exit;
+        }
+        if (!isset($_POST['csrf_token']) || !Csrf::check($_POST['csrf_token'])) {
+            Flash::add('Token CSRF invalide. Recharge la page.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        if ($projectId <= 0) {
+            Flash::add('ID de projet invalide.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+        $repo = new ProjectRepository();
+        $deleted = $repo->softDelete($projectId, (int)$_SESSION['user_id']);
+        if ($deleted) {
+            Flash::add('Projet supprimé avec succès.', 'success');
+        } else {
+            Flash::add('Projet non trouvé ou vous n\'avez pas accès à ce projet.', 'error');
+        }
+        header('Location: /projects');
+        exit;
+    }
 }

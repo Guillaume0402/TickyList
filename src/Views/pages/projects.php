@@ -10,6 +10,15 @@
                 <p class="page-header__sub">3 projets actifs · 17 tâches au total</p>
             </div>           
         </div>
+        <!-- Add new ─────────────────────────────────────────────────────── -->
+
+            <div class="project-add">
+                <form method="POST" action="/projects/create">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="text" name="name" required maxlength="255" placeholder="Nom du projet">
+                    <button type="submit" class="app-btn app-btn--primary">+ Nouveau projet</button>
+                </form>
+            </div>
 
         <div class="projects-grid">
 
@@ -43,18 +52,15 @@
                             <div class="progress-bar__fill" style="width:<?= $progress ?>%"></div>
                         </div>
                     </div>
+                    <div class="project-delete">
+                        <form method="POST" action="/projects/delete">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                            <button type="submit" class="app-btn app-btn--secondary">Supprimer</button>
+                        </form>
+                    </div>
                 </a>
-            <?php endforeach; ?>
-
-            <!-- Add new ─────────────────────────────────────────────────── -->
-
-            <div>
-                <form method="POST" action="/projects/create">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="text" name="name" required maxlength="255" placeholder="Nom du projet">
-                    <button type="submit" class="app-btn app-btn--primary">+ Nouveau projet</button>
-                </form>
-            </div>
+            <?php endforeach; ?>            
         </div>
     </main>
 

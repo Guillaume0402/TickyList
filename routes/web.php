@@ -17,5 +17,6 @@ $router->post('/logout', [AuthController::class, 'logout']);
 $router->get('/projects', [ProjectController::class, 'index']);
 $router->post('/projects/create', [ProjectController::class, 'create']);
 $router->get('/project', [ProjectController::class, 'show']);
+$router->post('/projects/delete', [ProjectController::class, 'delete']);
 
 

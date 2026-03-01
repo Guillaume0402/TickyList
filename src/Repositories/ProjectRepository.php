@@ -33,5 +33,12 @@ final class ProjectRepository
         $project = $stmt->fetch();
         return $project ?: null;
     }
+
+    public function softDelete(int $projectId, int $userId): bool
+    {
+        $stmt = db()->prepare("UPDATE projects SET deleted_at = NOW(), updated_at = NOW() WHERE id = :id AND user_id = :user_id AND deleted_at IS NULL");
+        $stmt->execute(['id' => $projectId, 'user_id' => $userId]);
+        return $stmt->rowCount() > 0;
+    }
     
 }

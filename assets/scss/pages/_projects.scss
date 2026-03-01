@@ -17,6 +17,37 @@
         margin: 4px 0 0;
     }
 }
+// ── Add project ───────────────────────────────────────────────────────────────
+
+.project-add {
+    margin-bottom: 24px;
+
+    form {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius);
+        background: var(--surface);
+        color: var(--text);
+        font-size: 0.95rem;
+
+        &:focus {
+            outline: none;
+            border-color: rgba(0, 230, 118, 0.4);
+        }
+    }
+}
+
+.project-delete {
+    margin-top: 12px;
+    text-align: right;
+}
 
 // ── Projects grid ─────────────────────────────────────────────────────────────
 .projects-grid {
