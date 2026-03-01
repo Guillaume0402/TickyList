@@ -60,5 +60,5 @@ final class HomeController extends AbstractController
             'error' => null,
             'old' => ['email' => ''],
         ]);
-    }
+    }  
 }
