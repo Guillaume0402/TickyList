@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Http\AbstractController;
 use App\Repositories\ProjectRepository;
+use App\Repositories\TaskRepository;
 use App\Services\Flash;
 use App\Services\Csrf;
 
@@ -63,7 +64,7 @@ final class ProjectController extends AbstractController
     public function show(): string
     {
         if (empty($_SESSION['user_id'])) {
-            Flash::add('Vous devez être connecté pour créer un projet.', 'error');
+            Flash::add('Vous devez être connecté pour accéder à ce projet.', 'error');
             header('Location: /login');
             exit;
         }
@@ -80,10 +81,33 @@ final class ProjectController extends AbstractController
             header('Location: /projects');
             exit;
         }
+        $tasksRepo = new TaskRepository();
+        $tasks = $tasksRepo->findActiveByProjectForUser($projectId, (int)$_SESSION['user_id']);
+
+        $todo = [];
+        $doing = [];
+        $done = [];
+        foreach ($tasks as $task) {
+            $status = (int)$task['status'];
+            switch ($status) {
+                case 0:
+                    $todo[] = $task;
+                    break;
+                case 1:
+                    $doing[] = $task;
+                    break;
+                case 2:
+                    $done[] = $task;
+                    break;
+            }
+        }
         return $this->render('pages/project-task', [
             'pageTitle' => $project['name'],
             'title' => $project['name'],
             'project' => $project,
+            'todo' => $todo,
+            'doing' => $doing,
+            'done' => $done,
         ]);
     }
 
