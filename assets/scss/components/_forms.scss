@@ -1,21 +1,56 @@
 @use "../abstracts/mixins" as *;
 
 .app-field {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 12px;
+    display: grid;
+    gap: 6px;
+    margin-bottom: 12px;
 
-  label { color: var(--muted); font-size: 0.95rem; }
+    label {
+        color: var(--muted);
+        font-size: 0.95rem;
+    }
 }
 
 .app-input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--radius);
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius);
 
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    font-size: 0.9rem;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
 
-  &:focus-visible { @include focus-ring; }
+    &:focus,
+    &:focus-visible {
+        @include focus-ring;
+        border-color: rgba(0, 230, 118, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    &::placeholder {
+        color: var(--muted);
+        opacity: 0.7;
+    }
+
+    // compact variant used in header forms
+    &--sm {
+        padding: 5px 10px;
+        font-size: 0.78rem;
+    }
+}
+
+.app-textarea {
+    resize: vertical;
+    min-height: 72px;
+    line-height: 1.5;
+}
+
+.app-field__optional {
+    font-size: 0.75rem;
+    color: var(--muted);
+    opacity: 0.6;
 }

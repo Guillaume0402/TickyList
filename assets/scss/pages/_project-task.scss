@@ -1,10 +1,29 @@
+@use "../abstracts/mixins" as *;
+
 // ── Project header ────────────────────────────────────────────────────────────
 .project-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: 24px;
     gap: 16px;
+
+    &__left {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        flex-shrink: 0;
+    }
 
     &__icon {
         width: 48px;
@@ -40,40 +59,52 @@
     }
 }
 
-// ── Add project ───────────────────────────────────────────────────────────────
+// ── Add task panel ───────────────────────────────────────────────────────────
+.task-form-panel {
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: panel-in 0.15s ease;
 
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    &__fields {
+        display: grid;
+        gap: 0;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 4px;
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ── Project management buttons ────────────────────────────────────────────────
 .project-btn {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-top: 12px;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    
-}
-
-.project-add {
-    margin-bottom: 24px;
-
-    form {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    input[type="text"] {
-        flex: 1;
-        padding: 10px 14px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: var(--radius);
-        background: var(--surface);
-        color: var(--text);
-        font-size: 0.95rem;
-
-        &:focus {
-            outline: none;
-            border-color: rgba(0, 230, 118, 0.4);
-        }
-    }
 }
 
 .project-rename {
@@ -82,26 +113,6 @@
         align-items: center;
         gap: 6px;
         pointer-events: auto;
-    }
-
-    input[type="text"] {
-        flex: 1;
-        min-width: 0;
-        padding: 5px 10px;
-        font-size: 0.78rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius);
-        color: var(--text);
-        transition:
-            border-color 0.15s,
-            background 0.15s;
-
-        &:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 230, 118, 0.35);
-        }
     }
 }
 
@@ -174,19 +185,25 @@
 
 .task-list {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 // ── Task card ─────────────────────────────────────────────────────────────────
 .task-card {
+    // 4 per row max, centered when fewer cards
+    flex: 0 1 calc(25% - 9px);
+    min-width: 220px;
+
     background: var(--surface);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-left: 3px solid transparent;
     border-radius: var(--radius);
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: 20px 1fr auto;
+    grid-template-columns: 28px 1fr auto;
     gap: 12px;
     align-items: start;
     transition:
@@ -196,6 +213,24 @@
 
     &:hover {
         background: rgba(255, 255, 255, 0.03);
+
+        .task-delete-btn,
+        .task-complete-btn,
+        .task-back-btn,
+        .task-edit-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    // empty-state card : no check column
+    &--empty {
+        grid-template-columns: 1fr;
+        cursor: default;
+        opacity: 0.5;
+        &:hover {
+            background: var(--surface);
+        }
     }
 
     &--todo {
@@ -210,29 +245,94 @@
     }
 }
 
-// ── Checkbox ──────────────────────────────────────────────────────────────────
-.task-check {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    flex-shrink: 0;
-    margin-top: 1px;
+// ── Task actions ─────────────────────────────────────────────────────────────
+.task-card__actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    padding-top: 1px;
+}
+
+// Base shared between all task icon-buttons
+%task-action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.15s,
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
 
-    .task-card--done & {
-        border-color: var(--primary);
-        background: rgba(0, 230, 118, 0.15);
+    &:focus-visible {
+        opacity: 1;
+        pointer-events: auto;
+        @include focus-ring;
+    }
+}
 
-        &::after {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
+.task-complete-btn {
+    @extend %task-action-btn;
+    color: var(--primary);
+
+    &:hover {
+        background: rgba(0, 230, 118, 0.12);
+        border-color: rgba(0, 230, 118, 0.3);
+        color: var(--primary);
+    }
+}
+
+.task-back-btn {
+    @extend %task-action-btn;
+    color: #448aff;
+
+    &:hover {
+        background: rgba(68, 138, 255, 0.12);
+        border-color: rgba(68, 138, 255, 0.3);
+        color: #448aff;
+    }
+}
+
+.task-delete-btn {
+    @extend %task-action-btn;
+    color: var(--muted);
+
+    &:hover {
+        color: #ff6b6b;
+        background: rgba(255, 82, 82, 0.1);
+        border-color: rgba(255, 82, 82, 0.25);
+    }
+}
+
+// ── Status column (col 1, replaces task-check) ───────────────────────────────
+.task-status-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-top: 1px;
+
+    // Status buttons in column 1 are always partially visible
+    .task-complete-btn,
+    .task-back-btn {
+        opacity: 0.25;
+        pointer-events: auto;
+    }
+}
+
+// Fully reveal on card hover
+.task-card:hover .task-status-col {
+    .task-complete-btn,
+    .task-back-btn {
+        opacity: 1;
     }
 }
 
@@ -360,5 +460,48 @@
     &:hover {
         border-color: rgba(0, 230, 118, 0.35);
         color: var(--primary);
+    }
+}
+
+// ── Edit button ───────────────────────────────────────────────────────────────
+.task-edit-btn {
+    @extend %task-action-btn;
+    color: var(--muted);
+
+    &:hover {
+        color: #ffd740;
+        background: rgba(255, 215, 64, 0.1);
+        border-color: rgba(255, 215, 64, 0.25);
+    }
+}
+
+// ── Bootstrap modal – dark theme ─────────────────────────────────────────────
+#modal-edit-task {
+    .modal-content {
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: calc(var(--radius) + 4px);
+        color: var(--text);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 20px 20px 16px;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 16px 20px 20px;
+        justify-content: flex-end;
+        gap: 8px;
     }
 }

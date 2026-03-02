@@ -2,6 +2,7 @@
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\ProjectController;
+use App\Controllers\TaskController;
 
 
 // Routes de l’application - à déclarer ici
@@ -19,6 +20,10 @@ $router->post('/projects/create', [ProjectController::class, 'create']);
 $router->get('/project', [ProjectController::class, 'show']);
 $router->post('/projects/delete', [ProjectController::class, 'delete']);
 $router->post('/projects/rename', [ProjectController::class, 'rename']);
+$router->post('/tasks/create', [TaskController::class, 'create']);
+$router->post('/tasks/delete', [TaskController::class, 'delete']);
+$router->post('/tasks/status', [TaskController::class, 'updateStatus']);
+$router->post('/tasks/update', [TaskController::class, 'update']);
 
 
 

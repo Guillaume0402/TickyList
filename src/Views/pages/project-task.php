@@ -1,82 +1,160 @@
 <div class="projects-layout">
 
-    <?php require __DIR__ . '/../partials/sidebar.php'; ?>
+    <?php
+
+    require __DIR__ . '/../partials/sidebar.php';
+
+    $todoCount     = count($todo);
+    $doingCount    = count($doing);
+    $doneCount     = count($done);
+    $total         = $todoCount + $doingCount + $doneCount;
+    $remainingCount = $todoCount + $doingCount;
+
+    ?>
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->
     <main>
-<?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?>
-        <!-- Project header ─────────────────────────────────────────────── -->
+
+        <!-- ── Project header ──────────────────────────────────────────── -->
         <div class="project-header">
-            <div style="display:flex;gap:14px;align-items:flex-start;">
+
+            <!-- Title + stats -->
+            <div class="project-header__left">
                 <div class="project-header__icon">🌿</div>
                 <div>
-                    <h1 class="project-header__title">EcoRide</h1>
+                    <h1 class="project-header__title"><?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?></h1>
                     <div class="project-header__meta">
                         <span class="project-header__stat">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 11 12 14 22 4" />
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                             </svg>
-                            5 terminées
+                            <?= $doneCount ?> terminées
                         </span>
                         <span class="project-header__stat">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
                                 <polyline points="12 6 12 12 16 14" />
                             </svg>
-                            3 restantes
-                        </span>
-                        <span class="project-header__stat">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                            </svg>
-                            1 en retard
+                            <?= $remainingCount ?> restantes
                         </span>
                     </div>
                 </div>
             </div>
-            <a href="#" class="app-btn app-btn--primary">+ Ajouter une tâche</a>
-             <div class="project-btn">
-                        <div class="project-rename">
-                            <form method="POST" action="/projects/rename">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                <input type="text" name="name" required maxlength="255" value="<?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?>">
-                                <button type="submit" class="app-btn app-btn--secondary">Renommer</button>
-                            </form>
-                        </div>
-                        <div class="project-delete">
-                            <form method="POST" action="/projects/delete">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                <button type="submit" class="app-btn app-btn--danger">Supprimer</button>
-                            </form>
-                        </div>
+
+            <!-- Actions : nouvelle tâche + gestion projet -->
+            <div class="project-header__actions">
+                <button
+                    type="button"
+                    class="app-btn app-btn--primary"
+                    id="btn-add-task"
+                    aria-expanded="false"
+                    aria-controls="panel-add-task">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Nouvelle tâche
+                </button>
+
+                <div class="project-btn">
+                    <!-- Rename -->
+                    <div class="project-rename">
+                        <form method="POST" action="/projects/rename">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                            <input
+                                type="text"
+                                name="name"
+                                class="app-input app-input--sm"
+                                required
+                                maxlength="255"
+                                value="<?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?>"
+                                autocomplete="off">
+                            <button type="submit" class="app-btn app-btn--secondary">Renommer</button>
+                        </form>
                     </div>
+                    <!-- Delete -->
+                    <div class="project-delete">
+                        <form method="POST" action="/projects/delete">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                            <button type="submit" class="app-btn app-btn--danger">Supprimer le projet</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Filter tabs ────────────────────────────────────────────────── -->
+
+        <!-- ── Add-task panel (toggle) ──────────────────────────────────── -->
+        <div class="task-form-panel" id="panel-add-task" hidden>
+            <form action="/tasks/create" method="post" class="task-form-panel__form">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+
+                <div class="task-form-panel__fields">
+                    <div class="app-field">
+                        <label for="task-title">Titre</label>
+                        <input
+                            type="text"
+                            id="task-title"
+                            name="title"
+                            class="app-input"
+                            required
+                            maxlength="255"
+                            placeholder="Nom de la tâche…"
+                            autocomplete="off"
+                            autofocus>
+                    </div>
+                    <div class="app-field">
+                        <label for="task-desc">Description <span class="app-field__optional">(optionnelle)</span></label>
+                        <textarea
+                            id="task-desc"
+                            name="description"
+                            class="app-input app-textarea"
+                            maxlength="1000"
+                            placeholder="Quelques détails…"
+                            rows="3"
+                            autocomplete="off"></textarea>
+                    </div>
+                </div>
+
+                <div class="task-form-panel__footer">
+                    <button type="submit" class="app-btn app-btn--primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Ajouter
+                    </button>
+                    <button type="button" class="app-btn" id="btn-cancel-task">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- ── Filter tabs ──────────────────────────────────────────────── -->
         <div class="task-filters">
-            <button class="task-filter-btn is-active">Tout (8)</button>
-            <button class="task-filter-btn">À faire (2)</button>
-            <button class="task-filter-btn">En cours (1)</button>
-            <button class="task-filter-btn">Terminé (5)</button>
+            <button class="task-filter-btn is-active">Tout (<?= $total ?>)</button>
+            <button class="task-filter-btn">À faire (<?= $todoCount ?>)</button>
+            <button class="task-filter-btn">En cours (<?= $doingCount ?>)</button>
+            <button class="task-filter-btn">Terminé (<?= $doneCount ?>)</button>
             <div style="flex:1"></div>
             <button class="task-filter-btn">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                 </svg>
                 Aujourd'hui
             </button>
             <button class="task-filter-btn">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 </svg>
                 En retard
             </button>
             <button class="task-filter-btn">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
@@ -86,77 +164,76 @@
             </button>
         </div>
 
-        <!-- ── Section : À faire ─────────────────────────────────────────── -->
+
+        <!-- ── Section : $todo ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">À faire</p>
             <div class="task-list">
-
-                <!-- Task 1 : high priority, late ─────────────────────────── -->
-                <div class="task-card task-card--todo">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Rédiger le cahier des charges V2</p>
-                        <p class="task-desc">Inclure les nouvelles exigences du client sur l'interface mobile.</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-todo">À faire</span>
-                            <span class="chip chip--p1">P1</span>
-                            <span class="chip chip--date is-late">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                25 févr. 2026
-                            </span>
-                            <span class="chip chip--reminder">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                                </svg>
-                                28 févr. 09:00
-                            </span>
+                <?php if (empty($todo)): ?>
+                    <div class="task-card task-card--todo task-card--empty">
+                        <div class="task-body">
+                            <p class="task-title">Aucune tâche à faire</p>
                         </div>
                     </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Task 2 : medium priority, today ──────────────────────── -->
-                <div class="task-card task-card--todo">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Mettre à jour les visuels marketing</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-todo">À faire</span>
-                            <span class="chip chip--p2">P2</span>
-                            <span class="chip chip--date is-today">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                Aujourd'hui
-                            </span>
+                <?php else: ?>
+                    <?php foreach ($todo as $task): ?>
+                        <div class="task-card task-card--todo">
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="1">
+                                    <button type="submit" class="task-complete-btn" aria-label="Démarrer">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 6L9 17l-5-5" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="task-body">
+                                <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php if (!empty($task['description'])): ?>
+                                    <p class="task-desc"><?= htmlspecialchars($task['description'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php endif; ?>
+                                <div class="task-chips">
+                                    <span class="chip chip--status-todo">À faire</span>
+                                </div>
+                            </div>
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    aria-label="Modifier la tâche"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                </button>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
-            <div class="add-task-row">
+            <div class="add-task-row" id="add-task-shortcut">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
@@ -165,209 +242,237 @@
             </div>
         </section>
 
-        <!-- ── Section : En cours ─────────────────────────────────────────── -->
+
+        <!-- ── Section : $doing ───────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">En cours</p>
             <div class="task-list">
-
-                <!-- Task 3 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--doing">
-                    <div class="task-check" style="border-color:#448aff;background:rgba(68,138,255,0.1);">
-                        <div style="width:6px;height:6px;border-radius:50%;background:#448aff;"></div>
-                    </div>
-                    <div class="task-body">
-                        <p class="task-title">Intégrer l'API de géolocalisation</p>
-                        <p class="task-desc">Connecter le service de trajet avec OpenStreetMap, tester les temps de réponse.</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-doing">En cours</span>
-                            <span class="chip chip--p1">P1</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                5 mars 2026
-                            </span>
-                            <span class="chip chip--reminder">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                                </svg>
-                                3 mars 14:00
-                            </span>
+                <?php if (empty($doing)): ?>
+                    <div class="task-card task-card--doing task-card--empty">
+                        <div class="task-body">
+                            <p class="task-title">Aucune tâche en cours</p>
                         </div>
                     </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
+                <?php else: ?>
+                    <?php foreach ($doing as $task): ?>
+                        <div class="task-card task-card--doing">
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="2">
+                                    <button type="submit" class="task-complete-btn" aria-label="Terminer">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 6L9 17l-5-5" />
+                                        </svg>
+                                    </button>
+                                </form>
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="0">
+                                    <button type="submit" class="task-back-btn" aria-label="Revenir à faire">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 14 4 9 9 4" />
+                                            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="task-body">
+                                <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php if (!empty($task['description'])): ?>
+                                    <p class="task-desc"><?= htmlspecialchars($task['description'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php endif; ?>
+                                <div class="task-chips">
+                                    <span class="chip chip--status-doing">En cours</span>
+                                </div>
+                            </div>
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    aria-label="Modifier la tâche"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                </button>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 
-        <!-- ── Section : Terminé ─────────────────────────────────────────── -->
+
+        <!-- ── Section : $done ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">Terminé</p>
             <div class="task-list">
-
-                <!-- Task 4 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--done">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Créer la maquette Figma de l'app</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-done">Terminé</span>
-                            <span class="chip chip--p2">P2</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                20 févr. 2026
-                            </span>
+                <?php if (empty($done)): ?>
+                    <div class="task-card task-card--done task-card--empty">
+                        <div class="task-body">
+                            <p class="task-title">Aucune tâche terminée</p>
                         </div>
                     </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Task 5 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--done">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Rédiger les user stories sprint 1</p>
-                        <p class="task-desc">Couverture des fonctionnalités réservation, notification et historique.</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-done">Terminé</span>
-                            <span class="chip chip--p3">P3</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                15 févr. 2026
-                            </span>
+                <?php else: ?>
+                    <?php foreach ($done as $task): ?>
+                        <div class="task-card task-card--done">
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="1">
+                                    <button type="submit" class="task-back-btn" aria-label="Reprendre">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 14 4 9 9 4" />
+                                            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="task-body">
+                                <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php if (!empty($task['description'])): ?>
+                                    <p class="task-desc"><?= htmlspecialchars($task['description'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <?php endif; ?>
+                                <div class="task-chips">
+                                    <span class="chip chip--status-done">Terminé</span>
+                                </div>
+                            </div>
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    aria-label="Modifier la tâche"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                </button>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Task 6 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--done">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Configurer le repo Git et CI/CD</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-done">Terminé</span>
-                            <span class="chip chip--p2">P2</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                10 févr. 2026
-                            </span>
-                        </div>
-                    </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Task 7 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--done">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Interview utilisateurs (5 participants)</p>
-                        <p class="task-desc">Recueil des besoins et pain-points pour la v1.</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-done">Terminé</span>
-                            <span class="chip chip--p1">P1</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                5 févr. 2026
-                            </span>
-                            <span class="chip chip--reminder">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                                </svg>
-                                4 févr. 10:30
-                            </span>
-                        </div>
-                    </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Task 8 ────────────────────────────────────────────────── -->
-                <div class="task-card task-card--done">
-                    <div class="task-check"></div>
-                    <div class="task-body">
-                        <p class="task-title">Élaborer le pitch deck investisseur</p>
-                        <div class="task-chips">
-                            <span class="chip chip--status-done">Terminé</span>
-                            <span class="chip chip--p3">P3</span>
-                            <span class="chip chip--date">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                1 févr. 2026
-                            </span>
-                        </div>
-                    </div>
-                    <div class="task-meta-aside">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)">
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="19" cy="12" r="1" />
-                            <circle cx="5" cy="12" r="1" />
-                        </svg>
-                    </div>
-                </div>
-
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 
     </main>
 
+    <!-- ── Modal : modifier une tâche ───────────────────────────────────── -->
+    <div class="modal fade" id="modal-edit-task" tabindex="-1" aria-labelledby="modal-edit-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modal-edit-title">Modifier la tâche</h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-edit-task" method="post" action="/tasks/update">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                        <input type="hidden" name="task_id" id="edit-task-id">
+                        <div class="app-field">
+                            <label for="edit-task-title">Titre</label>
+                            <input type="text" id="edit-task-title" name="title" class="app-input" placeholder="Titre de la tâche" required>
+                        </div>
+                        <div class="app-field">
+                            <label for="edit-task-desc">Description <span class="app-field__optional">optionnelle</span></label>
+                            <textarea id="edit-task-desc" name="description" class="app-input app-textarea" placeholder="Décrivez la tâche…"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="app-btn app-btn--secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" form="form-edit-task" class="app-btn app-btn--primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script>
+    (function() {
+        const btnOpen = document.getElementById('btn-add-task');
+        const btnCancel = document.getElementById('btn-cancel-task');
+        const btnShort = document.getElementById('add-task-shortcut');
+        const panel = document.getElementById('panel-add-task');
+        const titleInput = panel ? panel.querySelector('#task-title') : null;
+
+        function openPanel() {
+            panel.hidden = false;
+            btnOpen.setAttribute('aria-expanded', 'true');
+            if (titleInput) titleInput.focus();
+            panel.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        function closePanel() {
+            panel.hidden = true;
+            btnOpen.setAttribute('aria-expanded', 'false');
+            panel.querySelector('form').reset();
+        }
+
+        if (btnOpen) btnOpen.addEventListener('click', openPanel);
+        if (btnCancel) btnCancel.addEventListener('click', closePanel);
+        if (btnShort) btnShort.addEventListener('click', openPanel);
+    })();
+
+    // ── Modal modifier tâche (Bootstrap) ────────────────────────────────
+
+    (function() {
+        const modalEl = document.getElementById('modal-edit-task');
+
+        modalEl.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget; // le bouton qui a déclenché la modale
+            if (!btn) return;
+
+            document.getElementById('edit-task-id').value = btn.dataset.taskId || '';
+            document.getElementById('edit-task-title').value = btn.dataset.taskTitle || '';
+            document.getElementById('edit-task-desc').value = btn.dataset.taskDesc || '';
+        });
+    })();
+</script>
