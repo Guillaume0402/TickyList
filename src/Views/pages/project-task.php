@@ -188,6 +188,21 @@
                                     <span class="chip chip--status-todo">À faire</span>
                                 </div>
                             </div>
+                            <div class="task-card__actions">
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -225,6 +240,21 @@
                                     <span class="chip chip--status-doing">En cours</span>
                                 </div>
                             </div>
+                            <div class="task-card__actions">
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -254,6 +284,21 @@
                                 <div class="task-chips">
                                     <span class="chip chip--status-done">Terminé</span>
                                 </div>
+                            </div>
+                            <div class="task-card__actions">
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     <?php endforeach; ?>

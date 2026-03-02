@@ -1,3 +1,5 @@
+@use "../abstracts/mixins" as *;
+
 // ── Project header ────────────────────────────────────────────────────────────
 .project-header {
     display: flex;
@@ -205,6 +207,11 @@
 
     &:hover {
         background: rgba(255, 255, 255, 0.03);
+
+        .task-delete-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
     }
 
     // empty-state card : no check column
@@ -226,6 +233,45 @@
     &--done {
         border-left-color: var(--primary);
         opacity: 0.65;
+    }
+}
+
+// ── Task actions (delete) ─────────────────────────────────────────────────────
+.task-card__actions {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 1px;
+}
+
+.task-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.15s,
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
+
+    &:hover {
+        color: #ff6b6b;
+        background: rgba(255, 82, 82, 0.1);
+        border-color: rgba(255, 82, 82, 0.25);
+    }
+
+    &:focus-visible {
+        opacity: 1;
+        pointer-events: auto;
+        @include focus-ring;
     }
 }
 
