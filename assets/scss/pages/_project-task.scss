@@ -3,8 +3,25 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: 24px;
     gap: 16px;
+
+    &__left {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        flex-shrink: 0;
+    }
 
     &__icon {
         width: 48px;
@@ -40,40 +57,52 @@
     }
 }
 
-// ── Add project ───────────────────────────────────────────────────────────────
+// ── Add task panel ───────────────────────────────────────────────────────────
+.task-form-panel {
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: panel-in 0.15s ease;
 
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    &__fields {
+        display: grid;
+        gap: 0;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 4px;
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ── Project management buttons ────────────────────────────────────────────────
 .project-btn {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-top: 12px;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    
-}
-
-.project-add {
-    margin-bottom: 24px;
-
-    form {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    input[type="text"] {
-        flex: 1;
-        padding: 10px 14px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: var(--radius);
-        background: var(--surface);
-        color: var(--text);
-        font-size: 0.95rem;
-
-        &:focus {
-            outline: none;
-            border-color: rgba(0, 230, 118, 0.4);
-        }
-    }
 }
 
 .project-rename {
@@ -82,26 +111,6 @@
         align-items: center;
         gap: 6px;
         pointer-events: auto;
-    }
-
-    input[type="text"] {
-        flex: 1;
-        min-width: 0;
-        padding: 5px 10px;
-        font-size: 0.78rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius);
-        color: var(--text);
-        transition:
-            border-color 0.15s,
-            background 0.15s;
-
-        &:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 230, 118, 0.35);
-        }
     }
 }
 
@@ -196,6 +205,16 @@
 
     &:hover {
         background: rgba(255, 255, 255, 0.03);
+    }
+
+    // empty-state card : no check column
+    &--empty {
+        grid-template-columns: 1fr;
+        cursor: default;
+        opacity: 0.5;
+        &:hover {
+            background: var(--surface);
+        }
     }
 
     &--todo {
