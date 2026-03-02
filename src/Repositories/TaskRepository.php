@@ -66,4 +66,22 @@ final class TaskRepository
         $stmt->execute(['new_status' => $newStatus, 'task_id' => $taskId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
     }
+
+    public function updateForUser (int $taskId, string $newTitle, ?string $newDescription, int $userId): bool
+    {
+        $stmt = db()->prepare(
+            "UPDATE tasks t
+         JOIN projects p ON p.id = t.project_id
+         SET t.title = :new_title,
+             t.description = :new_description,
+             t.updated_at = NOW()
+         WHERE t.id = :task_id
+           AND t.deleted_at IS NULL
+           AND p.user_id = :user_id
+           AND p.deleted_at IS NULL"
+        );
+
+        $stmt->execute(['new_title' => $newTitle, 'new_description' => $newDescription, 'task_id' => $taskId, 'user_id' => $userId]);
+        return $stmt->rowCount() > 0;
+    }
 }

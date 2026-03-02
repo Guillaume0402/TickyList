@@ -200,19 +200,35 @@
                                     <span class="chip chip--status-todo">À faire</span>
                                 </div>
                             </div>
-                            <form action="/tasks/delete" method="post">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    aria-label="Modifier la tâche"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="3 6 5 6 21 6" />
-                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                        <path d="M10 11v6M14 11v6" />
-                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
                                 </button>
-                            </form>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -274,19 +290,35 @@
                                     <span class="chip chip--status-doing">En cours</span>
                                 </div>
                             </div>
-                            <form action="/tasks/delete" method="post">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    aria-label="Modifier la tâche"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="3 6 5 6 21 6" />
-                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                        <path d="M10 11v6M14 11v6" />
-                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
                                 </button>
-                            </form>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -330,19 +362,35 @@
                                     <span class="chip chip--status-done">Terminé</span>
                                 </div>
                             </div>
-                            <form action="/tasks/delete" method="post">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                            <div class="task-card__actions">
+                                <button
+                                    type="button"
+                                    class="task-edit-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-edit-task"
+                                    aria-label="Modifier la tâche"
+                                    data-task-id="<?= (int)$task['id'] ?>"
+                                    data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="3 6 5 6 21 6" />
-                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                        <path d="M10 11v6M14 11v6" />
-                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
                                 </button>
-                            </form>
+                                <form action="/tasks/delete" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6" />
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                            <path d="M10 11v6M14 11v6" />
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -350,6 +398,37 @@
         </section>
 
     </main>
+
+    <!-- ── Modal : modifier une tâche ───────────────────────────────────── -->
+    <div class="modal fade" id="modal-edit-task" tabindex="-1" aria-labelledby="modal-edit-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modal-edit-title">Modifier la tâche</h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-edit-task" method="post" action="/tasks/update">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                        <input type="hidden" name="task_id" id="edit-task-id">
+                        <div class="app-field">
+                            <label for="edit-task-title">Titre</label>
+                            <input type="text" id="edit-task-title" name="title" class="app-input" placeholder="Titre de la tâche" required>
+                        </div>
+                        <div class="app-field">
+                            <label for="edit-task-desc">Description <span class="app-field__optional">optionnelle</span></label>
+                            <textarea id="edit-task-desc" name="description" class="app-input app-textarea" placeholder="Décrivez la tâche…"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="app-btn app-btn--secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" form="form-edit-task" class="app-btn app-btn--primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -380,5 +459,20 @@
         if (btnOpen) btnOpen.addEventListener('click', openPanel);
         if (btnCancel) btnCancel.addEventListener('click', closePanel);
         if (btnShort) btnShort.addEventListener('click', openPanel);
+    })();
+
+    // ── Modal modifier tâche (Bootstrap) ────────────────────────────────
+
+    (function() {
+        const modalEl = document.getElementById('modal-edit-task');
+
+        modalEl.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget; // le bouton qui a déclenché la modale
+            if (!btn) return;
+
+            document.getElementById('edit-task-id').value = btn.dataset.taskId || '';
+            document.getElementById('edit-task-title').value = btn.dataset.taskTitle || '';
+            document.getElementById('edit-task-desc').value = btn.dataset.taskDesc || '';
+        });
     })();
 </script>

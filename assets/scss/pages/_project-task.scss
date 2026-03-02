@@ -216,7 +216,8 @@
 
         .task-delete-btn,
         .task-complete-btn,
-        .task-back-btn {
+        .task-back-btn,
+        .task-edit-btn {
             opacity: 1;
             pointer-events: auto;
         }
@@ -459,5 +460,48 @@
     &:hover {
         border-color: rgba(0, 230, 118, 0.35);
         color: var(--primary);
+    }
+}
+
+// ── Edit button ───────────────────────────────────────────────────────────────
+.task-edit-btn {
+    @extend %task-action-btn;
+    color: var(--muted);
+
+    &:hover {
+        color: #ffd740;
+        background: rgba(255, 215, 64, 0.1);
+        border-color: rgba(255, 215, 64, 0.25);
+    }
+}
+
+// ── Bootstrap modal – dark theme ─────────────────────────────────────────────
+#modal-edit-task {
+    .modal-content {
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: calc(var(--radius) + 4px);
+        color: var(--text);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 20px 20px 16px;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 16px 20px 20px;
+        justify-content: flex-end;
+        gap: 8px;
     }
 }
