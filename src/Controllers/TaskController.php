@@ -114,4 +114,44 @@ final class TaskController extends AbstractController
         header('Location: /project?id=' . $projectId);
         exit;
     }
+
+    public function updateStatus(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            http_response_code(405);
+            exit('Method Not Allowed');
+        }
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour mettre à jour une tâche.', 'error');
+            header('Location: /login');
+            exit;
+        }
+        if (!isset($_POST['csrf_token']) || !Csrf::check($_POST['csrf_token'])) {
+            Flash::add('Token CSRF invalide. Recharge la page.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+
+        $taskId = (int)($_POST['task_id'] ?? 0);
+        $newStatus = (int)($_POST['status'] ?? -1);
+        $projectId = (int)($_POST['project_id'] ?? 0);
+
+        if ($taskId <= 0 || $projectId <= 0 || !in_array($newStatus, [0, 1, 2], true)) {
+            Flash::add('Données invalides pour la mise à jour de la tâche.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+
+        $repo = new TaskRepository();
+        $updated = $repo->updateStatusForUser($taskId, $newStatus, (int)$_SESSION['user_id']);
+
+        if ($updated) {
+            Flash::add('Tâche mise à jour avec succès.', 'success');
+        } else {
+            Flash::add('Tâche introuvable ou non autorisée.', 'error');
+        }
+
+        header('Location: /project?id=' . $projectId);
+        exit;
+    }
 }

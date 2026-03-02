@@ -22,5 +22,7 @@ $router->post('/projects/delete', [ProjectController::class, 'delete']);
 $router->post('/projects/rename', [ProjectController::class, 'rename']);
 $router->post('/tasks/create', [TaskController::class, 'create']);
 $router->post('/tasks/delete', [TaskController::class, 'delete']);
+$router->post('/tasks/status', [TaskController::class, 'updateStatus']);
+
 
 
