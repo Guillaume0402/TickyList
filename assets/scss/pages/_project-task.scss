@@ -185,19 +185,25 @@
 
 .task-list {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 // ── Task card ─────────────────────────────────────────────────────────────────
 .task-card {
+    // 4 per row max, centered when fewer cards
+    flex: 0 1 calc(25% - 9px);
+    min-width: 220px;
+
     background: var(--surface);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-left: 3px solid transparent;
     border-radius: var(--radius);
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: 20px 1fr auto;
+    grid-template-columns: 28px 1fr auto;
     gap: 12px;
     align-items: start;
     transition:
@@ -208,7 +214,9 @@
     &:hover {
         background: rgba(255, 255, 255, 0.03);
 
-        .task-delete-btn {
+        .task-delete-btn,
+        .task-complete-btn,
+        .task-back-btn {
             opacity: 1;
             pointer-events: auto;
         }
@@ -236,14 +244,16 @@
     }
 }
 
-// ── Task actions (delete) ─────────────────────────────────────────────────────
+// ── Task actions ─────────────────────────────────────────────────────────────
 .task-card__actions {
     display: flex;
     align-items: flex-start;
+    gap: 4px;
     padding-top: 1px;
 }
 
-.task-delete-btn {
+// Base shared between all task icon-buttons
+%task-action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -252,7 +262,6 @@
     border-radius: 6px;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--muted);
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
@@ -262,12 +271,6 @@
         background 0.15s,
         border-color 0.15s;
 
-    &:hover {
-        color: #ff6b6b;
-        background: rgba(255, 82, 82, 0.1);
-        border-color: rgba(255, 82, 82, 0.25);
-    }
-
     &:focus-visible {
         opacity: 1;
         pointer-events: auto;
@@ -275,29 +278,60 @@
     }
 }
 
-// ── Checkbox ──────────────────────────────────────────────────────────────────
-.task-check {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    flex-shrink: 0;
-    margin-top: 1px;
+.task-complete-btn {
+    @extend %task-action-btn;
+    color: var(--primary);
+
+    &:hover {
+        background: rgba(0, 230, 118, 0.12);
+        border-color: rgba(0, 230, 118, 0.3);
+        color: var(--primary);
+    }
+}
+
+.task-back-btn {
+    @extend %task-action-btn;
+    color: #448aff;
+
+    &:hover {
+        background: rgba(68, 138, 255, 0.12);
+        border-color: rgba(68, 138, 255, 0.3);
+        color: #448aff;
+    }
+}
+
+.task-delete-btn {
+    @extend %task-action-btn;
+    color: var(--muted);
+
+    &:hover {
+        color: #ff6b6b;
+        background: rgba(255, 82, 82, 0.1);
+        border-color: rgba(255, 82, 82, 0.25);
+    }
+}
+
+// ── Status column (col 1, replaces task-check) ───────────────────────────────
+.task-status-col {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 2px;
+    padding-top: 1px;
 
-    .task-card--done & {
-        border-color: var(--primary);
-        background: rgba(0, 230, 118, 0.15);
+    // Status buttons in column 1 are always partially visible
+    .task-complete-btn,
+    .task-back-btn {
+        opacity: 0.25;
+        pointer-events: auto;
+    }
+}
 
-        &::after {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
+// Fully reveal on card hover
+.task-card:hover .task-status-col {
+    .task-complete-btn,
+    .task-back-btn {
+        opacity: 1;
     }
 }
 

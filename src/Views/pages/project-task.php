@@ -165,7 +165,7 @@
         </div>
 
 
-        <!-- ── Section : À faire ────────────────────────────────────────── -->
+        <!-- ── Section : $todo ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">À faire</p>
             <div class="task-list">
@@ -178,7 +178,19 @@
                 <?php else: ?>
                     <?php foreach ($todo as $task): ?>
                         <div class="task-card task-card--todo">
-                            <div class="task-check"></div>
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="1">
+                                    <button type="submit" class="task-complete-btn" aria-label="Démarrer">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 6L9 17l-5-5" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="task-body">
                                 <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php if (!empty($task['description'])): ?>
@@ -188,21 +200,19 @@
                                     <span class="chip chip--status-todo">À faire</span>
                                 </div>
                             </div>
-                            <div class="task-card__actions">
-                                <form action="/tasks/delete" method="post">
-                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6" />
-                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                            <path d="M10 11v6M14 11v6" />
-                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="/tasks/delete" method="post">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                        <path d="M10 11v6M14 11v6" />
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -217,7 +227,7 @@
         </section>
 
 
-        <!-- ── Section : En cours ───────────────────────────────────────── -->
+        <!-- ── Section : $doing ───────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">En cours</p>
             <div class="task-list">
@@ -230,7 +240,31 @@
                 <?php else: ?>
                     <?php foreach ($doing as $task): ?>
                         <div class="task-card task-card--doing">
-                            <div class="task-check"></div>
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="2">
+                                    <button type="submit" class="task-complete-btn" aria-label="Terminer">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 6L9 17l-5-5" />
+                                        </svg>
+                                    </button>
+                                </form>
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="0">
+                                    <button type="submit" class="task-back-btn" aria-label="Revenir à faire">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 14 4 9 9 4" />
+                                            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="task-body">
                                 <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php if (!empty($task['description'])): ?>
@@ -240,21 +274,19 @@
                                     <span class="chip chip--status-doing">En cours</span>
                                 </div>
                             </div>
-                            <div class="task-card__actions">
-                                <form action="/tasks/delete" method="post">
-                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6" />
-                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                            <path d="M10 11v6M14 11v6" />
-                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="/tasks/delete" method="post">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                        <path d="M10 11v6M14 11v6" />
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -262,7 +294,7 @@
         </section>
 
 
-        <!-- ── Section : Terminé ────────────────────────────────────────── -->
+        <!-- ── Section : $done ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">Terminé</p>
             <div class="task-list">
@@ -275,7 +307,20 @@
                 <?php else: ?>
                     <?php foreach ($done as $task): ?>
                         <div class="task-card task-card--done">
-                            <div class="task-check"></div>
+                            <div class="task-status-col">
+                                <form action="/tasks/status" method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                    <input type="hidden" name="status" value="1">
+                                    <button type="submit" class="task-back-btn" aria-label="Reprendre">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 14 4 9 9 4" />
+                                            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="task-body">
                                 <p class="task-title"><?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php if (!empty($task['description'])): ?>
@@ -285,21 +330,19 @@
                                     <span class="chip chip--status-done">Terminé</span>
                                 </div>
                             </div>
-                            <div class="task-card__actions">
-                                <form action="/tasks/delete" method="post">
-                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                                    <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
-                                    <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
-                                    <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6" />
-                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                            <path d="M10 11v6M14 11v6" />
-                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="/tasks/delete" method="post">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
+                                <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
+                                <button type="submit" class="task-delete-btn" aria-label="Supprimer la tâche">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                        <path d="M10 11v6M14 11v6" />
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
