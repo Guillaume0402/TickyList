@@ -29,14 +29,14 @@
                                 <polyline points="9 11 12 14 22 4" />
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                             </svg>
-                            <?= $doneCount ?> terminées
+                            <span id="count-done"><?= (int) $doneCount ?></span> terminées
                         </span>
                         <span class="project-header__stat">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10" />
                                 <polyline points="12 6 12 12 16 14" />
                             </svg>
-                            <?= $remainingCount ?> restantes
+                            <span id="count-remaining"><?= (int) $remainingCount ?></span> restantes
                         </span>
                     </div>
                 </div>
@@ -476,6 +476,29 @@
         });
     })();
 
+    // ── Mise à jour des compteurs dans le header (après changement de statut) ────────────────────────────────
+    function countRealCards(listEl) {
+        if (!listEl) return 0;
+        return listEl.querySelectorAll('.task-card:not(.task-card--empty)').length;
+    }
+
+    function refreshHeaderCounts() {
+        const todoList = document.getElementById('list-todo');
+        const doingList = document.getElementById('list-doing');
+        const doneList = document.getElementById('list-done');
+
+        const todoCount = countRealCards(todoList);
+        const doingCount = countRealCards(doingList);
+        const doneCount = countRealCards(doneList);
+        const remainingCount = todoCount + doingCount;
+
+        const doneEl = document.getElementById('count-done');
+        const remainingEl = document.getElementById('count-remaining');
+
+        if (doneEl) doneEl.textContent = String(doneCount);
+        if (remainingEl) remainingEl.textContent = String(remainingCount);
+    }
+    refreshHeaderCounts();
     // ── Gestion du changement de statut (AJAX) ─────────────────────────
     (function() {
         const listByStatus = {
@@ -657,7 +680,7 @@
                 // Update UI
                 setCardUi(card, newStatus);
                 rebuildStatusCol(card, newStatus, csrf, projectId, taskId);
-
+                refreshHeaderCounts();
             } finally {
                 if (btn) btn.disabled = false;
             }
