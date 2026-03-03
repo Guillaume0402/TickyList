@@ -211,4 +211,44 @@ final class TaskController extends AbstractController
         header('Location: /project?id=' . $projectId);
         exit;
     }
+
+    public function updateStatusAjax(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method Not Allowed']);
+            exit;
+        }
+        if (empty($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+        if (!isset($_POST['csrf_token']) || !Csrf::check($_POST['csrf_token'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        $taskId = (int)($_POST['task_id'] ?? 0);
+        $newStatus = (int)($_POST['status'] ?? -1);
+
+        if ($taskId <= 0 || !in_array($newStatus, [0, 1, 2], true)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid data']);
+            exit;
+        }
+
+        $repo = new TaskRepository();
+        $updated = $repo->updateStatusForUser($taskId, $newStatus, (int)$_SESSION['user_id']);
+
+        if ($updated) {
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Task not found or unauthorized']);
+        }
+        exit;
+    }
 }

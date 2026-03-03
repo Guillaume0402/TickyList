@@ -13,7 +13,7 @@
     ?>
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->
-    <main>
+    <main data-project-id="<?= (int)$project['id'] ?>">
 
         <!-- ── Project header ──────────────────────────────────────────── -->
         <div class="project-header">
@@ -168,7 +168,7 @@
         <!-- ── Section : $todo ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">À faire</p>
-            <div class="task-list">
+            <div class="task-list" id="list-todo">
                 <?php if (empty($todo)): ?>
                     <div class="task-card task-card--todo task-card--empty">
                         <div class="task-body">
@@ -177,9 +177,9 @@
                     </div>
                 <?php else: ?>
                     <?php foreach ($todo as $task): ?>
-                        <div class="task-card task-card--todo">
+                        <div class="task-card task-card--todo" data-task-id="<?= (int)$task['id'] ?>">
                             <div class="task-status-col">
-                                <form action="/tasks/status" method="post">
+                                <form class="js-status-form js-to-doing" action="/tasks/status-ajax" method="post">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
                                     <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
@@ -246,7 +246,7 @@
         <!-- ── Section : $doing ───────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">En cours</p>
-            <div class="task-list">
+            <div class="task-list" id="list-doing">
                 <?php if (empty($doing)): ?>
                     <div class="task-card task-card--doing task-card--empty">
                         <div class="task-body">
@@ -255,9 +255,9 @@
                     </div>
                 <?php else: ?>
                     <?php foreach ($doing as $task): ?>
-                        <div class="task-card task-card--doing">
+                        <div class="task-card task-card--doing" data-task-id="<?= (int)$task['id'] ?>">
                             <div class="task-status-col">
-                                <form action="/tasks/status" method="post">
+                                <form class="js-status-form js-to-done" action="/tasks/status-ajax" method="post">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
                                     <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
@@ -268,7 +268,7 @@
                                         </svg>
                                     </button>
                                 </form>
-                                <form action="/tasks/status" method="post">
+                                <form class="js-status-form js-to-todo" action="/tasks/status-ajax" method="post">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
                                     <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
@@ -329,7 +329,7 @@
         <!-- ── Section : $done ────────────────────────────────────────── -->
         <section class="task-section">
             <p class="task-section__label">Terminé</p>
-            <div class="task-list">
+            <div class="task-list" id="list-done">
                 <?php if (empty($done)): ?>
                     <div class="task-card task-card--done task-card--empty">
                         <div class="task-body">
@@ -338,9 +338,9 @@
                     </div>
                 <?php else: ?>
                     <?php foreach ($done as $task): ?>
-                        <div class="task-card task-card--done">
+                        <div class="task-card task-card--done" data-task-id="<?= (int)$task['id'] ?>">
                             <div class="task-status-col">
-                                <form action="/tasks/status" method="post">
+                                <form class="js-status-form js-to-doing" action="/tasks/status-ajax" method="post">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="project_id" value="<?= (int)$project['id'] ?>">
                                     <input type="hidden" name="task_id" value="<?= (int)$task['id'] ?>">
@@ -474,5 +474,194 @@
             document.getElementById('edit-task-title').value = btn.dataset.taskTitle || '';
             document.getElementById('edit-task-desc').value = btn.dataset.taskDesc || '';
         });
+    })();
+
+    // ── Gestion du changement de statut (AJAX) ─────────────────────────
+    (function() {
+        const listByStatus = {
+            0: document.getElementById('list-todo'),
+            1: document.getElementById('list-doing'),
+            2: document.getElementById('list-done'),
+        };
+
+        const statusInfo = {
+            0: {
+                cardClass: 'task-card--todo',
+                chipClass: 'chip--status-todo',
+                label: 'À faire'
+            },
+            1: {
+                cardClass: 'task-card--doing',
+                chipClass: 'chip--status-doing',
+                label: 'En cours'
+            },
+            2: {
+                cardClass: 'task-card--done',
+                chipClass: 'chip--status-done',
+                label: 'Terminé'
+            },
+        };
+
+        const ICON_CHECK = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  `.trim();
+
+        const ICON_BACK = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="9 14 4 9 9 4" />
+      <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+    </svg>
+  `.trim();
+
+        function setCardUi(card, newStatus) {
+            const info = statusInfo[newStatus];
+            if (!info) return;
+
+            // classes card
+            card.classList.remove('task-card--todo', 'task-card--doing', 'task-card--done');
+            card.classList.add(info.cardClass);
+
+            // chip
+            const chip = card.querySelector('.task-chips .chip');
+            if (chip) {
+                chip.classList.remove('chip--status-todo', 'chip--status-doing', 'chip--status-done');
+                chip.classList.add(info.chipClass);
+                chip.textContent = info.label;
+            }
+        }
+
+        function statusFormHtml({
+            csrf,
+            projectId,
+            taskId,
+            nextStatus,
+            btnClass,
+            aria,
+            icon
+        }) {
+            return `
+      <form class="js-status-form" action="/tasks/status-ajax" method="post">
+        <input type="hidden" name="csrf_token" value="${csrf}">
+        <input type="hidden" name="project_id" value="${projectId}">
+        <input type="hidden" name="task_id" value="${taskId}">
+        <input type="hidden" name="status" value="${nextStatus}">
+        <button type="submit" class="${btnClass}" aria-label="${aria}">
+          ${icon}
+        </button>
+      </form>
+    `.trim();
+        }
+
+        function rebuildStatusCol(card, newStatus, csrf, projectId, taskId) {
+            const col = card.querySelector('.task-status-col');
+            if (!col) return;
+
+            let html = '';
+
+            // TODO -> DOING
+            if (newStatus === 0) {
+                html = statusFormHtml({
+                    csrf,
+                    projectId,
+                    taskId,
+                    nextStatus: 1,
+                    btnClass: 'task-complete-btn',
+                    aria: 'Démarrer',
+                    icon: ICON_CHECK
+                });
+            }
+
+            // DOING -> DONE  +  DOING -> TODO
+            if (newStatus === 1) {
+                html = [
+                    statusFormHtml({
+                        csrf,
+                        projectId,
+                        taskId,
+                        nextStatus: 2,
+                        btnClass: 'task-complete-btn',
+                        aria: 'Terminer',
+                        icon: ICON_CHECK
+                    }),
+                    statusFormHtml({
+                        csrf,
+                        projectId,
+                        taskId,
+                        nextStatus: 0,
+                        btnClass: 'task-back-btn',
+                        aria: 'Revenir à faire',
+                        icon: ICON_BACK
+                    })
+                ].join('');
+            }
+
+            // DONE -> DOING
+            if (newStatus === 2) {
+                html = statusFormHtml({
+                    csrf,
+                    projectId,
+                    taskId,
+                    nextStatus: 1,
+                    btnClass: 'task-back-btn',
+                    aria: 'Reprendre',
+                    icon: ICON_BACK
+                });
+            }
+
+            col.innerHTML = html;
+        }
+
+        document.addEventListener('submit', async (e) => {
+            const form = e.target;
+            if (!(form instanceof HTMLFormElement)) return;
+            if (!form.classList.contains('js-status-form')) return;
+
+            e.preventDefault();
+
+            const taskId = Number(form.querySelector('input[name="task_id"]')?.value || 0);
+            const newStatus = Number(form.querySelector('input[name="status"]')?.value || -1);
+            const projectId = String(form.querySelector('input[name="project_id"]')?.value || '');
+            const csrf = String(form.querySelector('input[name="csrf_token"]')?.value || '');
+
+            if (!taskId || !projectId || !csrf || ![0, 1, 2].includes(newStatus)) return;
+
+            const card = form.closest('.task-card');
+            if (!card) return;
+
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok || !data || data.success !== true) {
+                    alert((data && data.message) ? data.message : 'Erreur lors de la mise à jour.');
+                    return;
+                }
+
+                // Move DOM
+                const targetList = listByStatus[newStatus];
+                if (targetList) targetList.prepend(card);
+
+                // Update UI
+                setCardUi(card, newStatus);
+                rebuildStatusCol(card, newStatus, csrf, projectId, taskId);
+
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }, true);
+
     })();
 </script>

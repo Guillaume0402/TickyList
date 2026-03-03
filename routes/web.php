@@ -24,6 +24,7 @@ $router->post('/tasks/create', [TaskController::class, 'create']);
 $router->post('/tasks/delete', [TaskController::class, 'delete']);
 $router->post('/tasks/status', [TaskController::class, 'updateStatus']);
 $router->post('/tasks/update', [TaskController::class, 'update']);
+$router->post('/tasks/status-ajax', [TaskController::class, 'updateStatusAjax']);
 
 
 
