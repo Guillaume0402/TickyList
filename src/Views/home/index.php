@@ -1,6 +1,7 @@
 <?php
+
 /** @var bool $isLogged */
-/** @var array $recentProjects */ 
+/** @var array $recentProjects */
 
 $isLogged = $isLogged ?? false;
 $recentProjects = $recentProjects ?? [];
@@ -79,23 +80,48 @@ $recentProjects = $recentProjects ?? [];
                 </div>
 
             <?php else: ?>
+                <?php
+                function progressPercent(int $done, int $total): int
+                {
+                    if ($total <= 0) return 0;
+                    return (int) round(($done / $total) * 100);
+                }
+                ?>
 
                 <?php foreach ($recentProjects as $project): ?>
                     <?php
-                    $total = (int) $project['task_count'];
-                    $done  = (int) $project['done_count'];
+                    $total = (int) ($project['task_count'] ?? 0);
+                    $done  = (int) ($project['done_count'] ?? 0);
+                    $remain = max(0, $total - $done);
+                    $pct = progressPercent($done, $total);
                     ?>
-                    <div class="app-card home-feature-card">
-                        <div class="home-feature-card__icon">📌</div>
-                        <h3 class="home-feature-card__title"><?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?></h3>
-                        <p class="home-feature-card__desc">
-                            <?php if ($total === 0): ?>
-                                Aucune tâche pour le moment.
-                            <?php else: ?>
-                                <?= $done ?> / <?= $total ?> tâche<?= $total > 1 ? 's' : '' ?> terminée<?= $done !== 1 ? 's' : '' ?>
-                            <?php endif; ?>
-                        </p>
-                        <a class="app-btn app-btn--primary" href="/project?id=<?= (int) $project['id'] ?>">Ouvrir le board</a>
+                    <div class="app-card home-project-card">
+                        <div class="home-project-card__top">
+                            <div class="home-project-card__icon">📌</div>
+                            <div class="home-project-card__head">
+                                <h3 class="home-project-card__title"><?= htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+
+                                <?php if ($total === 0): ?>
+                                    <p class="home-project-card__meta">Aucune tâche pour le moment.</p>
+                                <?php else: ?>
+                                    <p class="home-project-card__meta">
+                                        <?= $done ?> terminée<?= $done !== 1 ? 's' : '' ?> · <?= $remain ?> restante<?= $remain !== 1 ? 's' : '' ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="home-project-card__progress" aria-label="Progression">
+                            <div class="home-project-card__bar">
+                                <div class="home-project-card__barFill" style="width: <?= $pct ?>%"></div>
+                            </div>
+                            <div class="home-project-card__pct"><?= $pct ?>%</div>
+                        </div>
+
+                        <div class="home-project-card__actions">
+                            <a class="app-btn app-btn--primary" href="/project?id=<?= (int) $project['id'] ?>">Ouvrir</a>
+                            <a class="app-btn" href="/projects">Créer un projet</a>
+                        </div>
                     </div>
                 <?php endforeach; ?>
 
@@ -103,6 +129,19 @@ $recentProjects = $recentProjects ?? [];
                     <div class="app-card home-feature-card">
                         <div class="home-feature-card__icon">＋</div>
                         <h3 class="home-feature-card__title">Voir tout</h3>
+                        <div class="app-card home-project-card home-project-card--create">
+                            <div class="home-project-card__top">
+                                <div class="home-project-card__icon">＋</div>
+                                <div class="home-project-card__head">
+                                    <h3 class="home-project-card__title">Nouveau projet</h3>
+                                    <p class="home-project-card__meta">Crée un board en 10 secondes.</p>
+                                </div>
+                            </div>
+                            <div class="home-project-card__actions">
+                                <a class="app-btn app-btn--primary" href="/projects">Créer un projet</a>
+                                <a class="app-btn" href="/projects">Voir tous</a>
+                            </div>
+                        </div>
                         <p class="home-feature-card__desc">Retrouve l'ensemble de tes projets ou crées-en un nouveau.</p>
                         <a class="app-btn" href="/projects">Gérer mes projets</a>
                     </div>
