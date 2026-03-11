@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 
@@ -40,11 +41,40 @@ final class ProjectRepository
         $stmt->execute(['id' => $projectId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
     }
-    
+
     public function rename(int $projectId, int $userId, string $newName): bool
     {
         $stmt = db()->prepare("UPDATE projects SET name = :name, updated_at = NOW() WHERE id = :id AND user_id = :user_id AND deleted_at IS NULL");
         $stmt->execute(['name' => $newName, 'id' => $projectId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
+    }
+
+
+    public function findRecentWithStatsByUserId(int $userId, int $limit = 3): array
+    {
+        $limit = max(1, min($limit, 10));
+
+        $sql = "
+        SELECT
+            p.id,
+            p.name,
+            CAST(COUNT(t.id) AS UNSIGNED) AS task_count,
+            CAST(COALESCE(SUM(CASE WHEN t.status = 2 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS done_count
+        FROM projects p
+        LEFT JOIN tasks t
+            ON t.project_id = p.id
+           AND t.deleted_at IS NULL
+        WHERE p.user_id = :user_id
+          AND p.deleted_at IS NULL
+        GROUP BY p.id, p.name
+        ORDER BY COALESCE(p.updated_at, p.created_at) DESC, p.id DESC
+        LIMIT {$limit}
+    ";
+
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

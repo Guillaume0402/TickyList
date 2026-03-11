@@ -2,7 +2,7 @@
 
     <?php
 
-    require __DIR__ . '/../partials/sidebar.php';
+    // require __DIR__ . '/../partials/sidebar.php';
 
     $todoCount     = count($todo);
     $doingCount    = count($doing);
@@ -135,10 +135,10 @@
 
         <!-- ── Filter tabs ──────────────────────────────────────────────── -->
         <div class="task-filters">
-            <button class="task-filter-btn is-active">Tout (<?= $total ?>)</button>
-            <button class="task-filter-btn">À faire (<?= $todoCount ?>)</button>
-            <button class="task-filter-btn">En cours (<?= $doingCount ?>)</button>
-            <button class="task-filter-btn">Terminé (<?= $doneCount ?>)</button>
+            <button class="task-filter-btn is-active" data-filter="all">Tout (<?= $total ?>)</button>
+            <button class="task-filter-btn" data-filter="todo">À faire (<?= $todoCount ?>)</button>
+            <button class="task-filter-btn" data-filter="doing">En cours (<?= $doingCount ?>)</button>
+            <button class="task-filter-btn" data-filter="done">Terminé (<?= $doneCount ?>)</button>
             <div style="flex:1"></div>
             <button class="task-filter-btn">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -166,7 +166,7 @@
 
 
         <!-- ── Section : $todo ────────────────────────────────────────── -->
-        <section class="task-section">
+        <section class="task-section" data-section="todo">
             <p class="task-section__label">À faire</p>
             <div class="task-list" id="list-todo">
                 <?php if (empty($todo)): ?>
@@ -244,7 +244,7 @@
 
 
         <!-- ── Section : $doing ───────────────────────────────────────── -->
-        <section class="task-section">
+        <section class="task-section" data-section="doing">
             <p class="task-section__label">En cours</p>
             <div class="task-list" id="list-doing">
                 <?php if (empty($doing)): ?>
@@ -327,7 +327,7 @@
 
 
         <!-- ── Section : $done ────────────────────────────────────────── -->
-        <section class="task-section">
+        <section class="task-section" data-section="done">
             <p class="task-section__label">Terminé</p>
             <div class="task-list" id="list-done">
                 <?php if (empty($done)): ?>
@@ -687,4 +687,35 @@
         }, true);
 
     })();
+
+    // ── Gestion du filtrage des tâches ────────────────────────────────
+    (function () {
+  const filters = document.getElementById('task-filters');
+  if (!filters) return;
+
+  const buttons = Array.from(filters.querySelectorAll('.task-filter-btn[data-filter]'));
+  const sections = Array.from(document.querySelectorAll('.task-section[data-section]'));
+
+  function setActive(btn) {
+    buttons.forEach(b => b.classList.toggle('is-active', b === btn));
+  }
+
+  function applyFilter(filter) {
+    if (filter === 'all') {
+      sections.forEach(s => s.style.display = '');
+      return;
+    }
+    sections.forEach(s => {
+      s.style.display = (s.dataset.section === filter) ? '' : 'none';
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      setActive(btn);
+      applyFilter(filter);
+    });
+  });
+})();
 </script>

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Http\AbstractController;
+use App\Repositories\ProjectRepository;
 use App\Services\Csrf;
 use App\Services\Flash;
 
@@ -10,10 +11,18 @@ final class HomeController extends AbstractController
 {
     public function index(): string
     {
+        $isLogged = !empty($_SESSION['user_id']);
+
+        $recentProjects = [];
+        if ($isLogged) {
+            $repo = new ProjectRepository();
+            $recentProjects = $repo->findRecentWithStatsByUserId((int)$_SESSION['user_id'], 3);
+        }
+
         return $this->render('home/index', [
             'pageTitle' => 'Accueil',
-            'title' => 'Accueil',
-            'subtitle' => 'Routeur + layout OK',
+            'isLogged' => $isLogged,
+            'recentProjects' => $recentProjects,
         ]);
     }
 
@@ -60,5 +69,5 @@ final class HomeController extends AbstractController
             'error' => null,
             'old' => ['email' => ''],
         ]);
-    }  
+    }
 }
