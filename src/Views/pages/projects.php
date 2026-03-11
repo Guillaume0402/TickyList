@@ -13,10 +13,26 @@
         <!-- Add new ─────────────────────────────────────────────────────── -->
 
         <div class="project-add">
-            <form method="POST" action="/projects/create">
+            <form class="project-add__form" method="POST" action="/projects/create">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(\App\Services\Csrf::token(), ENT_QUOTES, 'UTF-8') ?>">
-                <input type="text" name="name" required maxlength="255" placeholder="Nom du projet">
-                <button type="submit" class="app-btn app-btn--primary">+ Nouveau projet</button>
+
+                <label class="sr-only" for="project-name">Nom du projet</label>
+                <div class="project-add__input-wrap">
+                    <input
+                        id="project-name"
+                        class="app-input project-add__input"
+                        type="text"
+                        name="name"
+                        required
+                        maxlength="255"
+                        placeholder="Nom du nouveau projet…"
+                        autocomplete="off">
+                </div>
+
+                <button type="submit" class="app-btn app-btn--primary project-add__btn">
+                    <span class="project-add__btnPlus">+</span>
+                    Nouveau projet
+                </button>
             </form>
         </div>
 
