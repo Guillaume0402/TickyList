@@ -84,4 +84,31 @@ final class TaskRepository
         $stmt->execute(['new_title' => $newTitle, 'new_description' => $newDescription, 'task_id' => $taskId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
     }
+
+    public function countQuickViewsByUserId(int $userId): array
+{
+    $sql = "
+        SELECT
+            SUM(CASE WHEN t.due_date = CURDATE() THEN 1 ELSE 0 END) AS today_count,
+            SUM(CASE WHEN t.due_date < CURDATE() THEN 1 ELSE 0 END) AS late_count,
+            SUM(CASE WHEN t.due_date > CURDATE() THEN 1 ELSE 0 END) AS upcoming_count
+        FROM tasks t
+        INNER JOIN projects p ON p.id = t.project_id
+        WHERE p.user_id = :user_id
+          AND p.deleted_at IS NULL
+          AND t.deleted_at IS NULL
+          AND t.status <> 2
+          AND t.due_date IS NOT NULL
+    ";
+    $stmt = db()->prepare($sql);
+    $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+
+    return [
+        'today' => (int)($row['today_count'] ?? 0),
+        'late' => (int)($row['late_count'] ?? 0),
+        'upcoming' => (int)($row['upcoming_count'] ?? 0),
+    ];
+}
 }

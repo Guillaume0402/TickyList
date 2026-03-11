@@ -1,16 +1,7 @@
 <?php
-
-/**
- * Sidebar partial – layout projects-layout
- *
- * Variables attendues :
- *   array  $projects        Liste des projets. Chaque entrée :
- *                             ['id' => int, 'name' => string, 'color' => string, 'task_count' => int]
- *   int|null $activeProjectId  Id du projet courant (null sur la liste des projets).
- */
-
 $activeProjectId ??= null;
-$projects        ??= [];
+$sidebarProjects ??= [];
+$quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
 ?>
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
@@ -25,7 +16,7 @@ $projects        ??= [];
                     <polyline points="12 6 12 12 16 14" />
                 </svg>
                 Aujourd'hui
-                <span class="sidebar__count sidebar__count--primary">4</span>
+                <span class="sidebar__count sidebar__count--primary"><?= (int) $quick['today'] ?></span>
             </a>
         </li>
         <li>
@@ -36,7 +27,7 @@ $projects        ??= [];
                     <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
                 En retard
-                <span class="sidebar__count sidebar__count--warning">2</span>
+                <span class="sidebar__count sidebar__count--warning"><?= (int) $quick['late'] ?></span>
             </a>
         </li>
         <li>
@@ -48,7 +39,7 @@ $projects        ??= [];
                     <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
                 À venir
-                <span class="sidebar__count">11</span>
+                <span class="sidebar__count sidebar__count--info"><?= (int) $quick['upcoming'] ?></span>
             </a>
         </li>
     </ul>
@@ -57,10 +48,10 @@ $projects        ??= [];
 
     <p class="sidebar__section-title">Projets</p>
     <ul class="sidebar__nav">
-        <?php foreach ($projects as $project): ?>
+        <?php foreach ($sidebarProjects as $project): ?>
             <li>
-                <a href="/projects/<?= $project['id'] ?>"
-                    <?= $project['id'] === $activeProjectId ? 'class="is-active"' : '' ?>>
+                <a href="/project?id=<?= (int)$project['id'] ?>"
+                    <?= (int)$project['id'] === (int)$activeProjectId ? 'class="is-active"' : '' ?>>
                     <?php $color = !empty($project['color']) ? $project['color'] : '#00e676'; ?>
                     <span style="width:10px;height:10px;border-radius:50%;background:<?= htmlspecialchars($color, ENT_QUOTES, 'UTF-8') ?>;flex-shrink:0;"></span>
                     <?= htmlspecialchars($project['name']) ?>

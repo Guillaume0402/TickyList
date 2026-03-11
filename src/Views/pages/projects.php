@@ -7,7 +7,9 @@
         <div class="page-header">
             <div>
                 <h1 class="page-header__title">Mes projets</h1>
-                <p class="page-header__sub">3 projets actifs · 17 tâches au total</p>
+                <p class="page-header__sub">
+                    <?= (int)$projectsCount ?> projets actifs · <?= (int)$tasksCount ?> tâches au total
+                </p>
             </div>
         </div>
         <!-- Add new ─────────────────────────────────────────────────────── -->
