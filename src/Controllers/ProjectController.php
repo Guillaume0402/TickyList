@@ -16,13 +16,31 @@ final class ProjectController extends AbstractController
             header('Location: /login');
             exit;
         }
-        $repo = new ProjectRepository();
-        $projects = $repo->findActiveWithStatsByUserId((int)$_SESSION['user_id']);
+
+        $userId = (int) $_SESSION['user_id'];
+
+        $projectRepo = new ProjectRepository();
+        $taskRepo    = new TaskRepository(); // si tu as la méthode quick views
+
+        $projects        = $projectRepo->findActiveWithStatsByUserId($userId);
+        $sidebarProjects = $projectRepo->findSidebarByUserId($userId);
+
+        $projectsCount = count($sidebarProjects);
+        $tasksCount = 0;
+        foreach ($sidebarProjects as $p) {
+            $tasksCount += (int) ($p['task_count'] ?? 0);
+        }
+
+        $quick = $taskRepo->countQuickViewsByUserId($userId); // sinon mets le tableau par défaut
+
         return $this->render('pages/projects', [
-            'pageTitle' => 'Mes Projets',
-            'title' => 'Mes Projets',
-            'subtitle' => 'Liste de vos projets avec stats',
-            'projects' => $projects,
+            'pageTitle'       => 'Mes Projets',
+            'projects'        => $projects,
+            'sidebarProjects' => $sidebarProjects,
+            'projectsCount'   => $projectsCount,
+            'tasksCount'      => $tasksCount,
+            'activeProjectId' => null,
+            'quick'           => $quick,
         ]);
     }
 

@@ -77,4 +77,28 @@ final class ProjectRepository
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    
+    public function findSidebarByUserId(int $userId): array
+    {
+        $sql = "
+        SELECT
+            p.id,
+            p.name,
+            p.color,
+            COUNT(t.id) AS task_count
+        FROM projects p
+        LEFT JOIN tasks t
+            ON t.project_id = p.id
+           AND t.deleted_at IS NULL
+        WHERE p.user_id = :user_id
+          AND p.deleted_at IS NULL
+        GROUP BY p.id, p.name, p.color
+        ORDER BY COALESCE(p.updated_at, p.created_at) DESC, p.id DESC
+        LIMIT 50
+    ";
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
