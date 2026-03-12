@@ -2,7 +2,12 @@
 
     <?php
 
-    // require __DIR__ . '/../partials/sidebar.php';
+    /** @var array<int, array<string, mixed>> $todo */
+    /** @var array<int, array<string, mixed>> $doing */
+    /** @var array<int, array<string, mixed>> $done */
+    /** @var array<string, mixed> $project */
+
+    require __DIR__ . '/../partials/sidebar.php';
 
     $todoCount     = count($todo);
     $doingCount    = count($doing);
@@ -689,33 +694,33 @@
     })();
 
     // ── Gestion du filtrage des tâches ────────────────────────────────
-    (function () {
-  const filters = document.getElementById('task-filters');
-  if (!filters) return;
+    (function() {
+        const filters = document.getElementById('task-filters');
+        if (!filters) return;
 
-  const buttons = Array.from(filters.querySelectorAll('.task-filter-btn[data-filter]'));
-  const sections = Array.from(document.querySelectorAll('.task-section[data-section]'));
+        const buttons = Array.from(filters.querySelectorAll('.task-filter-btn[data-filter]'));
+        const sections = Array.from(document.querySelectorAll('.task-section[data-section]'));
 
-  function setActive(btn) {
-    buttons.forEach(b => b.classList.toggle('is-active', b === btn));
-  }
+        function setActive(btn) {
+            buttons.forEach(b => b.classList.toggle('is-active', b === btn));
+        }
 
-  function applyFilter(filter) {
-    if (filter === 'all') {
-      sections.forEach(s => s.style.display = '');
-      return;
-    }
-    sections.forEach(s => {
-      s.style.display = (s.dataset.section === filter) ? '' : 'none';
-    });
-  }
+        function applyFilter(filter) {
+            if (filter === 'all') {
+                sections.forEach(s => s.style.display = '');
+                return;
+            }
+            sections.forEach(s => {
+                s.style.display = (s.dataset.section === filter) ? '' : 'none';
+            });
+        }
 
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-      setActive(btn);
-      applyFilter(filter);
-    });
-  });
-})();
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+                setActive(btn);
+                applyFilter(filter);
+            });
+        });
+    })();
 </script>
