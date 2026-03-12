@@ -1,7 +1,17 @@
 .app-card {
-  padding: 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    transition:
+        border-color var(--t),
+        box-shadow var(--t),
+        transform var(--t);
+
+    &:hover {
+        border-color: var(--border-2);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+        transform: translateY(-1px);
+    }
 }
