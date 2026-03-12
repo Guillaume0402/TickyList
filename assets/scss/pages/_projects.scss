@@ -112,7 +112,7 @@
 }
 
 /* Mobile: input puis bouton full width */
-@include respond(sm) {
+@media (max-width: 575px) {
     .project-add__form {
         flex-direction: column;
         align-items: stretch;

@@ -1,75 +1,37 @@
 @use "../abstracts/variables" as *;
 
 .footer {
-    position: relative;
-    overflow: hidden;
+    border-top: 1px solid var(--border);
 
-    // ── Ligne supérieure avec dégradé vert ──────────────────────────────────
-    &::before {
-        content: "";
-        display: block;
-        height: 1px;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(0, 230, 118, 0.4) 40%,
-            rgba(0, 230, 118, 0.4) 60%,
-            transparent 100%
-        );
-    }
-
-    // ── Lueur décorative en fond ─────────────────────────────────────────────
-    &__glow {
-        position: absolute;
-        top: -60px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 600px;
-        height: 200px;
-        background: radial-gradient(
-            ellipse at center,
-            rgba(0, 230, 118, 0.06) 0%,
-            transparent 70%
-        );
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    // ── Corps principal ───────────────────────────────────────────────────────
-    &__body {
-        position: relative;
-        z-index: 1;
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 48px;
-        padding: 40px 0 32px;
-
-        @media (max-width: $bp-md) {
-            grid-template-columns: 1fr 1fr;
-        }
+    // ── Top row: brand + nav ────────────────────────────────────────────────
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 24px 0 18px;
 
         @media (max-width: $bp-sm) {
-            grid-template-columns: 1fr;
-            gap: 28px;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
         }
     }
 
-    // ── Brand ─────────────────────────────────────────────────────────────────
     &__brand {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        text-decoration: none;
         font-weight: 800;
-        font-size: 1.1rem;
+        font-size: 1rem;
         color: var(--text);
-        margin-bottom: 10px;
+        text-decoration: none;
         letter-spacing: -0.3px;
+        flex-shrink: 0;
 
         span {
             color: var(--primary);
         }
-
         &:hover {
             color: var(--text);
         }
@@ -79,110 +41,79 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 26px;
-        height: 26px;
-        background: rgba(0, 230, 118, 0.12);
-        border: 1px solid rgba(0, 230, 118, 0.25);
+        width: 24px;
+        height: 24px;
+        background: var(--primary-dim);
+        border: 1px solid var(--primary-border);
         border-radius: 6px;
         color: var(--primary);
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 900;
         flex-shrink: 0;
     }
 
-    &__tagline {
-        font-size: 0.82rem;
-        color: var(--muted);
-        margin: 0;
-        line-height: 1.65;
-    }
-
-    // ── Colonnes liens ────────────────────────────────────────────────────────
-    &__col {
+    &__nav {
         display: flex;
-        flex-direction: column;
-        gap: 4px;
+        align-items: center;
+        gap: 2px;
+        flex-wrap: wrap;
 
-        &--brand {
-            gap: 10px;
+        @media (max-width: $bp-sm) {
+            justify-content: center;
         }
     }
 
-    &__col-title {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.09em;
-        text-transform: uppercase;
-        color: var(--muted);
-        margin: 0 0 10px;
-    }
-
-    &__links {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    &__link {
+    &__nav-link {
+        padding: 5px 10px;
+        border-radius: 6px;
         font-size: 0.875rem;
         color: var(--muted);
         text-decoration: none;
-        transition: color 0.15s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-
-        &::before {
-            content: "";
-            display: inline-block;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0;
-            transition:
-                opacity 0.15s,
-                transform 0.15s;
-            transform: translateX(-4px);
-        }
+        transition:
+            color var(--t),
+            background var(--t);
 
         &:hover {
             color: var(--text);
-
-            &::before {
-                opacity: 0.6;
-                transform: translateX(0);
-            }
+            background: var(--surface-2);
         }
     }
 
-    // ── Barre du bas ──────────────────────────────────────────────────────────
+    // ── Bottom row: copyright + user ─────────────────────────────────────────
     &__bottom {
-        position: relative;
-        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        padding: 14px 0;
+        gap: 12px;
+        padding: 12px 0;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
-        font-size: 0.75rem;
-        color: var(--muted);
 
         @media (max-width: $bp-sm) {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 4px;
         }
     }
 
-    &__bottom-user {
-        strong {
-            color: var(--text);
-            font-weight: 500;
-        }
+    &__copy {
+        font-size: 0.75rem;
+        color: var(--muted);
+    }
+
+    &__user {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        color: var(--muted);
+    }
+
+    &__user-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--primary);
+        box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+        flex-shrink: 0;
     }
 }

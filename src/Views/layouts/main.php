@@ -97,49 +97,28 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
     </main>
 
     <footer class="footer">
-        <div class="footer__glow" aria-hidden="true"></div>
         <div class="app-container">
-            <div class="footer__body">
-
-                <div class="footer__col footer__col--brand">
-                    <a class="footer__brand" href="/">
-                        <span class="footer__brand-icon" aria-hidden="true">✓</span>
-                        Ticky<span>List</span>
-                    </a>
-                    <p class="footer__tagline">
-                        Capturez, organisez et accomplissez&nbsp;—<br>sans friction.
-                    </p>
-                </div>
-
-                <div class="footer__col">
-                    <p class="footer__col-title">Navigation</p>
-                    <ul class="footer__links">
-                        <li><a class="footer__link" href="/">Accueil</a></li>
-                        <?php if ($isLoggedIn): ?>
-                            <li><a class="footer__link" href="/projects">Mes projets</a></li>
-                        <?php else: ?>
-                            <li><a class="footer__link" href="/register">Inscription</a></li>
-                            <li><a class="footer__link" href="/login">Connexion</a></li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-
-                <div class="footer__col">
-                    <p class="footer__col-title">Stack</p>
-                    <ul class="footer__links">
-                        <li><a class="footer__link" href="#">PHP MVC</a></li>
-                        <li><a class="footer__link" href="#">MySQL</a></li>
-                        <li><a class="footer__link" href="#">Docker</a></li>
-                    </ul>
-                </div>
-
+            <div class="footer__top">
+                <a class="footer__brand" href="/">
+                    <span class="footer__brand-icon" aria-hidden="true">✓</span>
+                    Ticky<span>List</span>
+                </a>
+                <nav class="footer__nav" aria-label="Navigation du site">
+                    <a class="footer__nav-link" href="/">Accueil</a>
+                    <?php if ($isLoggedIn): ?>
+                        <a class="footer__nav-link" href="/projects">Mes projets</a>
+                    <?php else: ?>
+                        <a class="footer__nav-link" href="/register">Inscription</a>
+                        <a class="footer__nav-link" href="/login">Connexion</a>
+                    <?php endif; ?>
+                </nav>
             </div>
-
             <div class="footer__bottom">
-                <small>&copy; <?= date('Y') ?> TickyList &mdash; Tous droits réservés.</small>
+                <small class="footer__copy">&copy; <?= date('Y') ?> TickyList &mdash; Tous droits réservés.</small>
                 <?php if ($isLoggedIn && $userEmail !== ''): ?>
-                    <small class="footer__bottom-user">
-                        Connecté en tant que <strong><?= htmlspecialchars($userEmail) ?></strong>
+                    <small class="footer__user">
+                        <span class="footer__user-dot" aria-hidden="true"></span>
+                        <?= htmlspecialchars($userEmail) ?>
                     </small>
                 <?php endif; ?>
             </div>

@@ -4,8 +4,20 @@ $sidebarProjects ??= [];
 $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
 ?>
 
+<div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
 <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar__mobile-header">
+        <span class="sidebar__mobile-title">Navigation</span>
+        <button class="sidebar__close" id="sidebarClose" aria-label="Fermer la navigation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+    </div>
 
     <p class="sidebar__section-title">Vues rapides</p>
     <ul class="sidebar__nav">

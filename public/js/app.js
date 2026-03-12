@@ -49,3 +49,32 @@ if (userMenuBtn && userDropdown) {
         }
     });
 }
+
+// Sidebar drawer (mobile)
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const sidebarClose = document.getElementById("sidebarClose");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+
+function openSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add("is-open");
+    sidebarBackdrop?.classList.add("is-active");
+    sidebarToggle?.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+}
+
+function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove("is-open");
+    sidebarBackdrop?.classList.remove("is-active");
+    sidebarToggle?.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+}
+
+if (sidebarToggle) sidebarToggle.addEventListener("click", openSidebar);
+if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
+if (sidebarBackdrop) sidebarBackdrop.addEventListener("click", closeSidebar);
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSidebar();
+});
