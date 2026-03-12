@@ -37,7 +37,8 @@ final class AuthController extends AbstractController
 
         // 5) Login OK -> session
         session_regenerate_id(true);
-        $_SESSION['user_id'] = (int) $user['id'];
+        $_SESSION['user_id']    = (int) $user['id'];
+        $_SESSION['user_email'] = $user['email'];
 
         Flash::add('Connexion réussie !', 'success');
         header('Location: /');
@@ -123,7 +124,8 @@ final class AuthController extends AbstractController
 
         // 6) Auto-login + flash
         session_regenerate_id(true);
-        $_SESSION['user_id'] = $userId;
+        $_SESSION['user_id']    = $userId;
+        $_SESSION['user_email'] = $email;
 
         Flash::add('✅ Compte créé ! Bienvenue 👋', 'success');
         header('Location: /');
