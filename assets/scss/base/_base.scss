@@ -2,26 +2,56 @@
     color-scheme: dark;
 }
 
-html,
-body {
-    height: 100%;
-}
-
 body {
     display: flex;
     flex-direction: column;
     min-height: 100dvh;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.5;
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv11", "ss01";
 }
 
 main {
     flex: 1;
 }
 
+// Sélection de texte
+::selection {
+    background: rgba(0, 230, 118, 0.22);
+    color: var(--text);
+}
+
+// Scroll doux
+html {
+    scroll-behavior: smooth;
+}
+
+// Scrollbar stylée (webkit)
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    &:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+}
+
 .surface {
     background: var(--surface);
     border-radius: var(--radius);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
 }

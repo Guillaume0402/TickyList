@@ -3,32 +3,39 @@
 // ── Page header ───────────────────────────────────────────────────────────────
 .page-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    gap: 16px;
 
     &__title {
         font-size: 1.5rem;
-        font-weight: 700;
+        font-weight: 800;
         margin: 0;
+        letter-spacing: -0.02em;
     }
 
     &__sub {
         font-size: 0.82rem;
         color: var(--muted);
-        margin: 4px 0 0;
+        margin: 5px 0 0;
     }
 }
+
+// ── Add project ───────────────────────────────────────────────────────────────
 .project-add {
     margin-bottom: 28px;
     background: var(--surface);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     padding: 16px 20px;
-    transition: border-color 0.2s;
+    transition:
+        border-color var(--t),
+        box-shadow var(--t);
 
     &:focus-within {
-        border-color: rgba(0, 230, 118, 0.35);
+        border-color: var(--primary-border);
+        box-shadow: 0 0 0 1px var(--primary-border);
     }
 }
 

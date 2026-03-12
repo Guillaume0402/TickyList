@@ -1,17 +1,17 @@
 .login-wrapper {
     display: flex;
     justify-content: center;
-    padding: 40px 16px;
+    padding: 48px 16px;
 }
 
 .login-card {
     width: 100%;
     max-width: 420px;
     padding: 40px 36px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     background: var(--surface);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .login-card__header {
@@ -21,20 +21,23 @@
 
 .login-card__title {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text);
     margin-bottom: 6px;
+    letter-spacing: -0.02em;
 }
 
 .login-card__subtitle {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--muted);
 }
 
 .login-card__submit {
     width: 100%;
     margin-top: 8px;
-    font-weight: 600;
+    padding: 11px;
+    font-weight: 700;
+    font-size: 0.95rem;
     color: var(--primary);
 }
 
@@ -47,6 +50,7 @@
     a {
         color: var(--primary);
         text-decoration: none;
+        font-weight: 500;
 
         &:hover {
             text-decoration: underline;
