@@ -506,3 +506,66 @@
     }
 }
 
+// ── Mobile responsive ─────────────────────────────────────────────────────────────────
+@media (max-width: 767px) {
+    // Prevent grid child from overflowing its track
+    main[data-project-id] {
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .project-header {
+        flex-direction: column;
+
+        &__actions {
+            width: 100%;
+            flex-shrink: 1;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+
+    .project-btn {
+        width: 100%;
+    }
+
+    .project-rename form {
+        flex-direction: column;
+        align-items: stretch;
+
+        .app-input--sm {
+            width: 100%;
+        }
+    }
+
+    .task-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        > div[style] {
+            display: none;
+        } // hide spacer div in mobile scroll
+    }
+
+    .task-filter-btn {
+        flex-shrink: 0;
+    }
+
+    .task-list {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .task-card {
+        flex: none;
+        width: 100%;
+        min-width: unset;
+    }
+}

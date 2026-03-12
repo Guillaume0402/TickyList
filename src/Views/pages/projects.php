@@ -4,6 +4,18 @@
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->
     <main>
+        <div class="mobile-nav-bar">
+            <button class="sidebar-toggle" id="sidebarToggle"
+                aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="sidebar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+            <span class="mobile-nav-bar__breadcrumb">Mes projets</span>
+        </div>
+
         <div class="page-header">
             <div>
                 <h1 class="page-header__title">Mes projets</h1>
