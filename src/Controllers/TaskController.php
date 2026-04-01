@@ -33,6 +33,8 @@ final class TaskController extends AbstractController
         $title = trim((string)($_POST['title'] ?? ''));
         $description = trim((string)($_POST['description'] ?? ''));
         $description = ($description === '') ? null : $description;
+        $dueDate = trim((string)($_POST['due_date'] ?? ''));
+        $dueDate = ($dueDate === '') ? null : $dueDate;
 
         if ($projectId <= 0) {
             Flash::add('ID de projet invalide.', 'error');
@@ -54,6 +56,11 @@ final class TaskController extends AbstractController
             header('Location: /project?id=' . $projectId);
             exit;
         }
+        if ($dueDate !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueDate)) {
+            Flash::add('Date d\'échéance invalide.', 'error');
+            header('Location: /project?id=' . $projectId);
+            exit;
+        }
         $projectRepo = new ProjectRepository();
         $project = $projectRepo->findByIdForUser($projectId, (int)$_SESSION['user_id']);
 
@@ -64,7 +71,7 @@ final class TaskController extends AbstractController
         }
 
         $repo = new TaskRepository();
-        $taskId = $repo->create($projectId, $title, $description);
+        $taskId = $repo->create($projectId, $title, $description, $dueDate);
         Flash::add('Tâche créée avec succès.', 'success');
         header('Location: /project?id=' . $projectId);
         exit;
@@ -176,6 +183,8 @@ final class TaskController extends AbstractController
         $title = trim((string)($_POST['title'] ?? ''));
         $description = trim((string)($_POST['description'] ?? ''));
         $description = ($description === '') ? null : $description;
+        $dueDate = trim((string)($_POST['due_date'] ?? ''));
+        $dueDate = ($dueDate === '') ? null : $dueDate;
         $projectId = (int)($_POST['project_id'] ?? 0);
 
         if ($taskId <= 0 || $projectId <= 0) {
@@ -198,9 +207,14 @@ final class TaskController extends AbstractController
             header('Location: /project?id=' . $projectId);
             exit;
         }
+        if ($dueDate !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueDate)) {
+            Flash::add('Date d\'échéance invalide.', 'error');
+            header('Location: /project?id=' . $projectId);
+            exit;
+        }
 
         $repo = new TaskRepository();
-        $updated = $repo->updateForUser($taskId, $title, $description, (int)$_SESSION['user_id']);
+        $updated = $repo->updateForUser($taskId, $title, $description, $dueDate, (int)$_SESSION['user_id']);
 
         if ($updated) {
             Flash::add('Tâche mise à jour avec succès.', 'success');

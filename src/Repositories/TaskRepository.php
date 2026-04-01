@@ -8,7 +8,7 @@ final class TaskRepository
     public function findActiveByProjectForUser(int $projectId, int $userId): array
     {
         $stmt = db()->prepare(
-            "SELECT t.id, t.title, t.description, t.status, t.created_at, t.updated_at 
+            "SELECT t.id, t.title, t.description, t.status, t.due_date, t.created_at, t.updated_at 
                 FROM tasks t 
                 JOIN projects p 
                 ON p.id = t.project_id
@@ -22,14 +22,14 @@ final class TaskRepository
         return $stmt->fetchAll();
     }
 
-    public function create(int $projectId, string $title, ?string $description): int
+    public function create(int $projectId, string $title, ?string $description, ?string $dueDate): int
     {
         $pdo = db();
         $stmt = $pdo->prepare(
-            "INSERT INTO tasks (project_id, title, description, status) 
-                VALUES (:project_id, :title, :description, 0)"
+            "INSERT INTO tasks (project_id, title, description, status, due_date) 
+                VALUES (:project_id, :title, :description, 0, :due_date)"
         );
-        $stmt->execute(['project_id' => $projectId, 'title' => $title, 'description' => $description]);
+        $stmt->execute(['project_id' => $projectId, 'title' => $title, 'description' => $description, 'due_date' => $dueDate]);
         return (int)$pdo->lastInsertId();
     }
 
@@ -67,13 +67,14 @@ final class TaskRepository
         return $stmt->rowCount() > 0;
     }
 
-    public function updateForUser(int $taskId, string $newTitle, ?string $newDescription, int $userId): bool
+    public function updateForUser(int $taskId, string $newTitle, ?string $newDescription, ?string $newDueDate, int $userId): bool
     {
         $stmt = db()->prepare(
             "UPDATE tasks t
          JOIN projects p ON p.id = t.project_id
          SET t.title = :new_title,
              t.description = :new_description,
+             t.due_date = :new_due_date,
              t.updated_at = NOW()
          WHERE t.id = :task_id
            AND t.deleted_at IS NULL
@@ -81,7 +82,7 @@ final class TaskRepository
            AND p.deleted_at IS NULL"
         );
 
-        $stmt->execute(['new_title' => $newTitle, 'new_description' => $newDescription, 'task_id' => $taskId, 'user_id' => $userId]);
+        $stmt->execute(['new_title' => $newTitle, 'new_description' => $newDescription, 'new_due_date' => $newDueDate, 'task_id' => $taskId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
     }
 
@@ -189,6 +190,39 @@ final class TaskRepository
         $stmt = db()->prepare($sql);
         $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public function findByDueFilterByUserId(int $userId, string $filter): array
+    {
+        $sql = "
+                        SELECT t.id, t.project_id, t.title, t.description, t.status, t.due_date, p.name as project_name
+            FROM tasks t
+            INNER JOIN projects p ON p.id = t.project_id
+            WHERE p.user_id = :user_id
+              AND t.deleted_at IS NULL
+              AND p.deleted_at IS NULL
+        ";
+
+        switch ($filter) {
+            case 'today':
+                $sql .= " AND t.due_date = CURDATE() AND t.status <> 2";
+                break;
+            case 'late':
+                $sql .= " AND t.due_date < CURDATE() AND t.status <> 2";
+                break;
+            case 'upcoming':
+                $sql .= " AND t.due_date > CURDATE() AND t.status <> 2";
+                break;
+            default:
+                return [];
+        }
+
+        $sql .= " ORDER BY t.created_at DESC";
+
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
