@@ -58,15 +58,18 @@ final class ProjectRepository
         SELECT
             p.id,
             p.name,
+            '' AS description,
+            COALESCE(p.updated_at, p.created_at) AS last_activity_at,
             CAST(COUNT(t.id) AS UNSIGNED) AS task_count,
-            CAST(COALESCE(SUM(CASE WHEN t.status = 2 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS done_count
+            CAST(COALESCE(SUM(CASE WHEN t.status = 2 THEN 1 ELSE 0 END), 0) AS UNSIGNED) AS done_count,
+            MAX(CASE WHEN t.due_date < CURDATE() AND t.status <> 2 THEN 1 ELSE 0 END) AS is_late
         FROM projects p
         LEFT JOIN tasks t
             ON t.project_id = p.id
            AND t.deleted_at IS NULL
         WHERE p.user_id = :user_id
           AND p.deleted_at IS NULL
-        GROUP BY p.id, p.name
+                GROUP BY p.id, p.name, p.updated_at, p.created_at
         ORDER BY COALESCE(p.updated_at, p.created_at) DESC, p.id DESC
         LIMIT {$limit}
     ";
@@ -77,7 +80,7 @@ final class ProjectRepository
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-    
+
     public function findSidebarByUserId(int $userId): array
     {
         $sql = "

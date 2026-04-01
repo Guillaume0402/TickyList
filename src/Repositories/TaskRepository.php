@@ -49,8 +49,8 @@ final class TaskRepository
         $stmt->execute(['task_id' => $taskId, 'user_id' => $userId]);
         return $stmt->rowCount() > 0;
     }
-    
-    public function updateStatusForUser (int $taskId, int $newStatus, int $userId): bool
+
+    public function updateStatusForUser(int $taskId, int $newStatus, int $userId): bool
     {
         $stmt = db()->prepare(
             "UPDATE tasks t
@@ -67,7 +67,7 @@ final class TaskRepository
         return $stmt->rowCount() > 0;
     }
 
-    public function updateForUser (int $taskId, string $newTitle, ?string $newDescription, int $userId): bool
+    public function updateForUser(int $taskId, string $newTitle, ?string $newDescription, int $userId): bool
     {
         $stmt = db()->prepare(
             "UPDATE tasks t
@@ -86,8 +86,8 @@ final class TaskRepository
     }
 
     public function countQuickViewsByUserId(int $userId): array
-{
-    $sql = "
+    {
+        $sql = "
         SELECT
             SUM(CASE WHEN t.due_date = CURDATE() THEN 1 ELSE 0 END) AS today_count,
             SUM(CASE WHEN t.due_date < CURDATE() THEN 1 ELSE 0 END) AS late_count,
@@ -100,15 +100,97 @@ final class TaskRepository
           AND t.status <> 2
           AND t.due_date IS NOT NULL
     ";
-    $stmt = db()->prepare($sql);
-    $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
-    $stmt->execute();
-    $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
 
-    return [
-        'today' => (int)($row['today_count'] ?? 0),
-        'late' => (int)($row['late_count'] ?? 0),
-        'upcoming' => (int)($row['upcoming_count'] ?? 0),
-    ];
-}
+        return [
+            'today' => (int)($row['today_count'] ?? 0),
+            'late' => (int)($row['late_count'] ?? 0),
+            'upcoming' => (int)($row['upcoming_count'] ?? 0),
+        ];
+    }
+
+    public function getGlobalStatsByUserId(int $userId): array
+    {
+        $sql = "
+        SELECT
+            SUM(CASE WHEN t.status = 2 THEN 1 ELSE 0 END) AS done_count,
+            SUM(CASE WHEN t.status = 1 THEN 1 ELSE 0 END) AS in_progress_count,
+            SUM(CASE WHEN t.due_date < CURDATE() AND t.status <> 2 THEN 1 ELSE 0 END) AS late_count,
+            SUM(CASE WHEN t.due_date = CURDATE() AND t.status <> 2 THEN 1 ELSE 0 END) AS today_count,
+            COUNT(DISTINCT CASE WHEN t.status <> 2 THEN t.project_id END) AS projects_in_progress,
+            COUNT(DISTINCT CASE WHEN t.due_date < CURDATE() AND t.status <> 2 THEN t.project_id END) AS projects_late,
+            SUM(CASE WHEN t.updated_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS weekly_total,
+            SUM(CASE WHEN t.status = 2 AND t.updated_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS weekly_done
+        FROM tasks t
+        INNER JOIN projects p ON p.id = t.project_id
+        WHERE p.user_id = :user_id
+          AND p.deleted_at IS NULL
+          AND t.deleted_at IS NULL
+    ";
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+        $weeklyTotal = (int)($row['weekly_total'] ?? 0);
+        $weeklyDone = (int)($row['weekly_done'] ?? 0);
+
+        return [
+            'done' => (int)($row['done_count'] ?? 0),
+            'in_progress' => (int)($row['in_progress_count'] ?? 0),
+            'late' => (int)($row['late_count'] ?? 0),
+            'today' => (int)($row['today_count'] ?? 0),
+            'projects_in_progress' => (int)($row['projects_in_progress'] ?? 0),
+            'projects_late' => (int)($row['projects_late'] ?? 0),
+            'weekly_progress' => $weeklyTotal > 0 ? (int)round(($weeklyDone / $weeklyTotal) * 100) : 0,
+        ];
+    }
+
+    public function getTodayTasksByUserId(int $userId, int $limit = 5): array
+    {
+        $sql = "
+            SELECT t.id, t.title, p.name as project_name
+            FROM tasks t
+            INNER JOIN projects p ON p.id = t.project_id
+            WHERE p.user_id = :user_id
+              AND t.due_date = CURDATE()
+              AND t.status <> 2
+              AND t.deleted_at IS NULL
+              AND p.deleted_at IS NULL
+            ORDER BY t.created_at DESC
+            LIMIT :limit
+        ";
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getRecentActivityByUserId(int $userId, int $limit = 5): array
+    {
+        $sql = "
+            SELECT
+                t.title,
+                p.name AS project_name,
+                t.status,
+                t.updated_at
+            FROM tasks t
+            INNER JOIN projects p ON p.id = t.project_id
+            WHERE p.user_id = :user_id
+              AND p.deleted_at IS NULL
+              AND t.deleted_at IS NULL
+            ORDER BY t.updated_at DESC
+            LIMIT :limit
+        ";
+
+        $stmt = db()->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
