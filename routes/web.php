@@ -1,4 +1,5 @@
 <?php
+
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\ProjectController;
@@ -25,6 +26,7 @@ $router->post('/tasks/delete', [TaskController::class, 'delete']);
 $router->post('/tasks/status', [TaskController::class, 'updateStatus']);
 $router->post('/tasks/update', [TaskController::class, 'update']);
 $router->post('/tasks/status-ajax', [TaskController::class, 'updateStatusAjax']);
-
-
-
+$router->get('/today', [ProjectController::class, 'quickView']);
+$router->get('/late', [ProjectController::class, 'quickView']);
+$router->get('/later', [ProjectController::class, 'quickView']);
+$router->get('/upcoming', [ProjectController::class, 'quickView']);

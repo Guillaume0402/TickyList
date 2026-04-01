@@ -207,4 +207,45 @@ final class ProjectController extends AbstractController
         header('Location: /project?id=' . (int)$projectId);
         exit;
     }
+    public function quickView(): string
+    {
+        if (empty($_SESSION['user_id'])) {
+            Flash::add('Vous devez être connecté pour accéder à cette vue.', 'error');
+            header('Location: /login');
+            exit;
+        }
+
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+        $viewType = trim($path, '/');
+        if ($viewType === 'later') {
+            $viewType = 'late';
+        }
+        $allowedViews = [
+            'today' => "Aujourd'hui",
+            'late' => 'En retard',
+            'upcoming' => 'À venir',
+        ];
+
+        if (!isset($allowedViews[$viewType])) {
+            Flash::add('Vue rapide invalide.', 'error');
+            header('Location: /projects');
+            exit;
+        }
+
+        $userId = (int) $_SESSION['user_id'];
+        $taskRepo = new TaskRepository();
+        $projectsRepo = new ProjectRepository();
+        $tasks = $taskRepo->findByDueFilterByUserId($userId, $viewType);
+        $sidebarProjects = $projectsRepo->findSidebarByUserId($userId);
+
+        return $this->render('pages/quick-view', [
+            'pageTitle' => $allowedViews[$viewType],
+            'viewTitle' => $allowedViews[$viewType],
+            'quickViewType' => $viewType,
+            'tasks' => $tasks,
+            'sidebarProjects' => $sidebarProjects,
+            'activeProjectId' => null,
+            'quick' => $taskRepo->countQuickViewsByUserId($userId),
+        ]);
+    }
 }

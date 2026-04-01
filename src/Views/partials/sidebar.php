@@ -2,6 +2,7 @@
 $activeProjectId ??= null;
 $sidebarProjects ??= [];
 $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
+$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 ?>
 
 <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
@@ -22,7 +23,7 @@ $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
     <p class="sidebar__section-title">Vues rapides</p>
     <ul class="sidebar__nav">
         <li>
-            <a href="/today">
+            <a href="/today" <?= $currentPath === '/today' ? 'class="is-active"' : '' ?>>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
@@ -32,7 +33,7 @@ $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
             </a>
         </li>
         <li>
-            <a href="/late">
+            <a href="/late" <?= ($currentPath === '/late' || $currentPath === '/later') ? 'class="is-active"' : '' ?>>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                     <line x1="12" y1="9" x2="12" y2="13" />
@@ -43,7 +44,7 @@ $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
             </a>
         </li>
         <li>
-            <a href="/upcoming">
+            <a href="/upcoming" <?= $currentPath === '/upcoming' ? 'class="is-active"' : '' ?>>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
@@ -60,14 +61,14 @@ $quick ??= ['today' => 0, 'late' => 0, 'upcoming' => 0];
 
     <p class="sidebar__section-title">Projets</p>
     <ul class="sidebar__nav">
-        <?php foreach ($sidebarProjects as $project): ?>
+        <?php foreach ($sidebarProjects as $sidebarProject): ?>
             <li>
-                <a href="/project?id=<?= (int)$project['id'] ?>"
-                    <?= (int)$project['id'] === (int)$activeProjectId ? 'class="is-active"' : '' ?>>
-                    <?php $color = !empty($project['color']) ? $project['color'] : '#00e676'; ?>
+                <a href="/project?id=<?= (int)$sidebarProject['id'] ?>"
+                    <?= (int)$sidebarProject['id'] === (int)$activeProjectId ? 'class="is-active"' : '' ?>>
+                    <?php $color = !empty($sidebarProject['color']) ? $sidebarProject['color'] : '#00e676'; ?>
                     <span style="width:10px;height:10px;border-radius:50%;background:<?= htmlspecialchars($color, ENT_QUOTES, 'UTF-8') ?>;flex-shrink:0;"></span>
-                    <?= htmlspecialchars($project['name']) ?>
-                    <span class="sidebar__count"><?= (int) $project['task_count'] ?></span>
+                    <?= htmlspecialchars($sidebarProject['name']) ?>
+                    <span class="sidebar__count"><?= (int) $sidebarProject['task_count'] ?></span>
                 </a>
             </li>
         <?php endforeach; ?>
