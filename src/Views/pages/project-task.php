@@ -135,6 +135,14 @@
                             rows="3"
                             autocomplete="off"></textarea>
                     </div>
+                    <div class="app-field">
+                        <label for="task-due-date">Date d'echeance <span class="app-field__optional">(optionnelle)</span></label>
+                        <input
+                            type="date"
+                            id="task-due-date"
+                            name="due_date"
+                            class="app-input">
+                    </div>
                 </div>
 
                 <div class="task-form-panel__footer">
@@ -226,7 +234,8 @@
                                     data-bs-target="#modal-edit-task"
                                     data-task-id="<?= (int)$task['id'] ?>"
                                     data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
-                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-due-date="<?= htmlspecialchars($task['due_date'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -316,7 +325,8 @@
                                     data-bs-target="#modal-edit-task"
                                     data-task-id="<?= (int)$task['id'] ?>"
                                     data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
-                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-due-date="<?= htmlspecialchars($task['due_date'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -388,7 +398,8 @@
                                     aria-label="Modifier la tâche"
                                     data-task-id="<?= (int)$task['id'] ?>"
                                     data-task-title="<?= htmlspecialchars($task['title'], ENT_QUOTES, 'UTF-8') ?>"
-                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                    data-task-desc="<?= htmlspecialchars($task['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                    data-task-due-date="<?= htmlspecialchars($task['due_date'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -436,6 +447,10 @@
                         <div class="app-field">
                             <label for="edit-task-desc">Description <span class="app-field__optional">optionnelle</span></label>
                             <textarea id="edit-task-desc" name="description" class="app-input app-textarea" placeholder="Décrivez la tâche…"></textarea>
+                        </div>
+                        <div class="app-field">
+                            <label for="edit-task-due-date">Date d'echeance <span class="app-field__optional">(optionnelle)</span></label>
+                            <input type="date" id="edit-task-due-date" name="due_date" class="app-input">
                         </div>
                     </form>
                 </div>
@@ -490,6 +505,7 @@
             document.getElementById('edit-task-id').value = btn.dataset.taskId || '';
             document.getElementById('edit-task-title').value = btn.dataset.taskTitle || '';
             document.getElementById('edit-task-desc').value = btn.dataset.taskDesc || '';
+            document.getElementById('edit-task-due-date').value = btn.dataset.taskDueDate || '';
         });
     })();
 
